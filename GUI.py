@@ -1,4 +1,4 @@
-import SoftG4 as G4
+from main import *
 
 # Tkinter
 import tkinter as tk
@@ -11,21 +11,68 @@ from tkcalendar import Calendar, DateEntry
 window = Tk()
 
 class Funcoes():
+
+    # Fornece dados dos motoristas para o dropdawn
+    def list_moto(self):
+        list_ = []
+        arquivos = os.listdir('data_csv/')
+        [list_.append(str(i)[:-4].replace(" ", "_")) for i in arquivos]
+        return list_
+
+    # Limpa as entrys
     def limpar(self):
         self.lb_codigo_entry.delete(0, END)
         self.lb_nome_entry.delete(0, END)
         self.lb_telefone_entry.delete(0, END)
         self.lb_cidade_entry.delete(0, END)
 
+    # Backend Data Screpping e Criação do banco de dados
+    def data_screrping(self):
+        #Extrai as conversas do whatsapp
+        self.SoftG4 = SoftG4()
+        # Cria os scripts sql
+        self.scripts = Sql_scripts()
+        # Aloca os dados do Banco de dados
+        self.cliente = Sql_insert()
+
+    # Conectar ao banco de dados
+    def connect_sql(self):
+        self.connect = Connect()
+
+    # desconectar do banco de dados
+    def disconect_sql(self):
+        self.connect.close_db()
+
+    # Selecionar tabela
+    def select_tb(self):
+        self.listaCli.delete(*self.listaCli.get_children())
+        self.connect_sql()
+        lista = self.connect.cursor.execute(""" SELECT cod, data, hora, valor FROM MOT_CARLOS_HONDA_AMARELO """)
+        i=0
+        for info in lista:
+            print(info)
+            self.listaCli.insert("", END, values=info)
+        self.disconect_sql()
+
+
+
+
+
+        
+
 class Application(Funcoes):
 
     def __init__(self):
+        self.data_screrping()
         self.window = window
         self.tela()
         self.frames_tela()
         self.widgets_frame_1()
         self.list_frame_2()
+        self.select_tb()
         window.mainloop()
+
+
 
     def tela(self):
         self.window.title("Soft G4")
@@ -77,6 +124,8 @@ class Application(Funcoes):
         self.lb_cidade_entry = Entry(self.frame_1)
         self.lb_cidade_entry.place(relx=0.35, rely=0.65, relwidth=0.5)
 
+
+
         # Botão limpar
         self.bt_limpar = Button(self.frame_1, text="limpar", bd=2, bg='#76BCDD', 
             fg='white', font=('verdana', 7, 'bold'), command=self.limpar)
@@ -85,7 +134,7 @@ class Application(Funcoes):
         # Botão buscar
         self.bt_buscar = Button(self.frame_1, text="buscar", bd=2, bg='#76BCDD', 
             fg='white', font=('verdana', 7, 'bold'))
-        self.bt_buscar.place(relx=0.3, rely=0.1, relwidth=0.1, relheight=0.15)
+        #self.bt_buscar.place(relx=0.3, rely=0.1, relwidth=0.1, relheight=0.15)
 
         # Botão novo
         self.bt_novo = Button(self.frame_1, text="novo", bd=2, bg='#76BCDD', 
@@ -102,39 +151,77 @@ class Application(Funcoes):
             fg='white', font=('verdana', 7, 'bold'))
         self.bt_apagar.place(relx=0.8, rely=0.1, relwidth=0.1, relheight=0.15)
 
+
+
+
+        # Opções do dropdawn
+        options = self.list_moto()
+
+        # Criar dropdawn
+        self.dropdawn = StringVar()
+        self.dropdawn.set("motorista")
+
+        # Configurar e alocar dropdawn
+        self.drop = OptionMenu(self.window, self.dropdawn, *options)
+        self.drop.place(relx=0.35, rely=0.1, relwidth=0.2, relheight=0.05)
+
+        # Criar Calendarios
+
+
+
+
+
+
+
+
+
+
     def list_frame_2(self):
 
         self.scroll_list = Scrollbar(self.frame_2, orient='vertical')
         
         self.listaCli = ttk.Treeview(self.frame_2, height=3, column=("coll1", "coll2", "coll3", "coll4"), yscroll=self.scroll_list)
+        
         self.listaCli.heading("#0", text="")
-        self.listaCli.heading("#1", text="Codigo")
-        self.listaCli.heading("#2", text="Nome")
-        self.listaCli.heading("#3", text="Telefone")
-        self.listaCli.heading("#4", text="Cidade")
+        self.listaCli.heading("#1", text="cod")
+        self.listaCli.heading("#2", text="data")
+        self.listaCli.heading("#3", text="hora")
+        self.listaCli.heading("#4", text="valor")
 
-
-        self.listaCli.column("#0", width=1)
-        self.listaCli.column("#1", width=50)
-        self.listaCli.column("#2", width=200)
-        self.listaCli.column("#3", width=125)
-        self.listaCli.column("#4", width=125)
+        self.listaCli.column("#0", width=0)
+        self.listaCli.column("#1", width=10)
+        self.listaCli.column("#2", width=45)
+        self.listaCli.column("#3", width=45)
+        self.listaCli.column("#4", width=45)
 
         self.listaCli.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
         self.scroll_list.place(relx=0.96, rely=0.1, relwidth=0.04, relheight=0.85)
 
 
+a = Application()
 
 
 
 
 
+        #def calendar_view():
+"""            def print_sel():
+                print(cal1.selection_get(), cal2.selection_get())
 
+            cal1 = Calendar(self.frame_data, font="Arial 14", selectmode='day', cursor="hand1", year=2020, month=2, day=5)
+            cal2 = Calendar(self.frame_data, font="Arial 14", selectmode='day', cursor="hand1", year=2020, month=2, day=5)
 
+            cal1.pack(fill="both", expand=True)
+            cal2.pack(fill="both", expand=True)
 
+            ttk.Button(self.frame_data, text="ok", command=print_sel).pack()
 
-Application()
+        def dateentry_view():
+            def print_sel(e):
+                print(cal.get_date())
 
-
-
-
+            ttk.Label(self.window, text='Choose date').pack(padx=10, pady=10)
+            cal = DateEntry(self.frame_data, width=12, background='darkblue',
+                            foreground='white', borderwidth=2)
+            cal.pack(padx=10, pady=10)
+            cal.bind("<return>", print_sel)"""
