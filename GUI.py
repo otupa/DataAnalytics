@@ -38,21 +38,28 @@ class Funcoes():
         return True
 
     # Selecionar tabela
-    def select_tb(self):
+    def select_tb(self, arg, data):
+
         self.listaCli.delete(*self.listaCli.get_children())
+
         self.connect_sql()
-        lista = self.connect.cursor.execute(""" SELECT cod, data, hora, valor FROM MOT_CARLOS_HONDA_AMARELO """)
-        i=0
-        for info in lista:
-            print(info)
-            self.listaCli.insert("", END, values=info)
+
+        schema = open('sql/SEARCH_'+arg+'.sql').read()
+
+        lista = self.connect.cursor.execute(schema, (data,))
+        
+        [self.listaCli.insert("", END, values=info) for info in lista]
+
         self.disconect_sql()
 
     # recebe a string do dropdawn
-    def drop_data(self, selection):
-        print(selection)
-        return True
+    def pesquisar(self):
         
+        self.data_1 = self.calendar_1.get()
+        self.data_2 = self.calendar_2.get()
+        self.nome = self.drop_.get()
+
+        self.select_tb(self.nome, self.data_1)
 
 class Application(Funcoes):
 
@@ -68,7 +75,7 @@ class Application(Funcoes):
         self.botoes()
         self.Treeview_frame_1()
         self.Treeview_frame_2()
-        self.select_tb()
+
 
         window.mainloop()
 
@@ -124,7 +131,7 @@ class Application(Funcoes):
 
         self.drop_.set("MOTORISTA")
 
-        self.drop = OptionMenu(self.frame_1, self.drop_, *options, command=self.drop_data)
+        self.drop = OptionMenu(self.frame_1, self.drop_, *options)
 
         self.drop.place(relx=0.05, rely = 0.1, relwidth = 0.40, relheight = 0.15)
 
@@ -144,7 +151,7 @@ class Application(Funcoes):
     def botoes(self):
 
         self.bt_pesquisar = Button(self.frame_1, text="PESQUISAR", bd=2, 
-            bg='#364094', fg='white', font=('verdana', 10, 'bold'), command=None)
+            bg='#364094', fg='white', font=('verdana', 10, 'bold'), command=self.pesquisar)
 
         self.bt_export_pdf = Button(self.frame_1, text="EXPORTAR PDF", bd=2, 
             bg='#364094', fg='white', font=('verdana', 8, 'bold'), command=None)
