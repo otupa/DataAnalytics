@@ -5,6 +5,8 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
+from datetime import datetime
+
 
 
 
@@ -12,32 +14,28 @@ window = Tk()
 
 class Funcoes():
 
-    def list_moto(self):
-        list_ = []
-        arquivos = os.listdir('data_csv/')
-        [list_.append(str(i)[:-4].replace(" ", "_")) for i in arquivos]
-        return list_
+    def inicializar(self):
 
-    # Backend Data Screpping e Criação do banco de dados
-    def data_screrping(self):
-        #Extrai as conversas do whatsapp
         self.SoftG4 = SoftG4()
-        # Cria os scripts sql
-        self.scripts = Sql_scripts()
-        # Aloca os dados do Banco de dados
-        self.cliente = Sql_insert()
 
-    # Conectar ao banco de dados
+        self.SoftG4.extract_csv()
+
+        self.SoftG4.Sql_scripts()
+
+        self.SoftG4.Sql_insert()
+
     def connect_sql(self):
         self.connect = Connect()
         return True
 
-    # desconectar do banco de dados
-    def disconect_sql(self):
-        self.connect.close_db()
-        return True
+    def tb_treeview(self, arg):
+        try:
+            [self.listaCli.insert("", END, values=info) for info in arg]
+            print("Dados incluidos no frame_2 com sucesso\n")
+        except Exception as error:
+            print("Erro ao incluir dados no frame_2", error, "\n")
+            return True
 
-    # Selecionar tabela
     def select_tb(self, arg, data):
 
         self.listaCli.delete(*self.listaCli.get_children())
@@ -47,24 +45,33 @@ class Funcoes():
         schema = open('sql/SEARCH_'+arg+'.sql').read()
 
         lista = self.connect.cursor.execute(schema, (data,))
-        
-        [self.listaCli.insert("", END, values=info) for info in lista]
 
-        self.disconect_sql()
+        self.tb_treeview(lista)
+        self.tb_treeview(lista)
 
-    # recebe a string do dropdawn
+        self.connect.close_db()
+
+    # Botões
     def pesquisar(self):
+
+        def function():
+            pass
         
         self.data_1 = self.calendar_1.get()
         self.data_2 = self.calendar_2.get()
+
         self.nome = self.drop_.get()
+
+        dates = self.SoftG4.date_generator(self.data_1, self.data_2)
+
+        print(dates)
 
         self.select_tb(self.nome, self.data_1)
 
 class Application(Funcoes):
 
     def __init__(self):
-        self.data_screrping()
+        self.inicializar()
         self.window = window
 
         self.tela()
@@ -89,43 +96,25 @@ class Application(Funcoes):
 
     def frames_tela(self):
 
-        # Frame que exibe as funções
-        self.frame_1 = Frame(
-            self.window, 
-            bd=4, 
-            bg='#dfe3ee',
-            highlightbackground='#759fe6', 
-            highlightthickness=3
-            )
+        self.frame_1 = Frame(self.window, bd=4, bg='#dfe3ee',
+            highlightbackground='#759fe6', highlightthickness=3)
 
-        # Frame que exibe o banco de dados
-        self.frame_2 = Frame(
-            self.window, 
-            bd=4, 
-            bg='#dfe3ee',
-            highlightbackground='#759fe6', 
-            highlightthickness=3
-            )
+        self.frame_2 = Frame(self.window, bd=4, bg='#dfe3ee',
+            highlightbackground='#759fe6', highlightthickness=3)
 
-        # Empacotando de forma responsiva
-        self.frame_1.place(
-            relx=0.02, 
-            rely=0.02, 
-            relwidth=0.96,
-            relheight=0.46
-            )
+        self.frame_1.place(relx=0.02, rely=0.02, relwidth=0.96,relheight=0.46)
 
-        # Empacotando de forma responsiva
-        self.frame_2.place(
-            relx=0.02, 
-            rely=0.5, 
-            relwidth=0.96, 
-            relheight=0.46
-            )
+        self.frame_2.place(relx=0.02, rely=0.5, relwidth=0.96, relheight=0.46)
 
     def menu_moto(self):
 
-        options = self.list_moto()
+        def list_moto():
+            list_ = []
+            arquivos = os.listdir('data_csv/')
+            [list_.append(str(i)[:-4].replace(" ", "_")) for i in arquivos]
+            return list_
+
+        options = list_moto()
 
         self.drop_ = StringVar()
 
@@ -139,10 +128,10 @@ class Application(Funcoes):
         
         # Criando calendario
         self.calendar_1 = DateEntry(self.frame_1, width=12, background='#3D51C3', foreground='white', 
-            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2020, month=2, day=5)
+            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2020, month=12, day=25)
 
         self.calendar_2 = DateEntry(self.frame_1, width=12, background='#3D51C3',foreground='white', 
-            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2020, month=2, day=5)
+            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2020, month=12, day=9)
 
         self.calendar_1.place(relx=0.05, rely=0.35, relwidth=0.19, relheight=0.1)
 
