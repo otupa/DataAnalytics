@@ -32,9 +32,13 @@ class SoftG4():
 
             # Separa apenas as informações desejadas
             data = re.findall(r"\d+/\d+/\d+", arg)
+
             hora = re.findall(r"\d+\:\d+", arg)
             valor = re.findall(r"\d+\sreais", arg)
             r = [data, hora, valor]
+
+            if not r[0]:
+                r[0] = self.data_frame[-1][0]
 
             # Remove caracteres indesejados
             try:
@@ -42,8 +46,9 @@ class SoftG4():
                     r[i] = j[0].replace(',','[').replace('!',']').replace('.','')
             except Exception as e:
                 print('Erro inesperado ao filtrar conversa: ', e)
-                print(r)
                 return True
+
+            r[2] = "R$"+r[2][:-6]+",00"
 
             # Incere os dados em uma lista usada pelo Pandas
             self.data_frame.append(r)
@@ -100,8 +105,6 @@ class SoftG4():
 
             table.write(schema_)
 
-            
-
         # Para cada .csv em dir_csv aciona loop_dir
         for file in os.listdir(dir_csv):
             nome_csv = os.path.basename(dir_csv+file)[:-4]
@@ -146,41 +149,21 @@ class SoftG4():
 
         self.db.close_db()
 
-    def date_generator(self, data, data_final):
-
-        data_dd = data[:2]
-        data_dd = int(data_dd)
-
-        data_mm = data[3:]
-        data_mm = data_mm[:2]
-        data_mm = int(data_mm)
-
-        data_yy = data[6:]
-        data_yy = int(data_yy)
-
-        data_final_dd = data_final[:2]
-        data_final_dd = int(data_final_dd)
-
-        data_final_mm = data_final[3:]
-        data_final_mm = data_final_mm[:2]
-        data_final_mm = int(data_final_mm)
-
-        data_final_yy = data_final[6:]
-        data_final_yy = int(data_final_yy)
+    def date_generator(self, data_inicial, data_final):
 
 
-        data_inicio = date(data_yy, data_mm, data_dd)
+        data_inicio = datetime.strptime(data_inicial, '%d/%m/%Y').date()
 
-        data_fim = date(data_final_yy, data_final_mm, data_final_dd)
+        data_fim = datetime.strptime(data_final, '%d/%m/%Y').date()
 
-        delta = data_fim - data_inicio
+        # crio somente 1 timedelta (de 1 dia)
+        incremento = timedelta(days=1)
 
         lista_datas = []
-
-        for i in range(delta.days + 1):
-            day = data_inicio + timedelta(days=i)
-            lista_datas.append(day.strftime('%d/%m/%y'))
-
+        # vou somando 1 dia na data_inicio, até que ela seja maior que data_fim
+        while data_inicio <= data_fim:
+            lista_datas.append(data_inicio.strftime('%d/%m/%Y'))
+            data_inicio += incremento
         return lista_datas
 
 
@@ -192,17 +175,6 @@ class Connect():
             # conectando...
             self.conn = sqlite3.connect('BaseG4.db')
             self.cursor = self.conn.cursor()
-
-            # imprimindo nome do banco
-            print("Banco:", 'BaseG4.db')
-
-            # lendo a versão do SQLite
-            self.cursor.execute('SELECT SQLITE_VERSION()')
-            self.data = self.cursor.fetchone()
-
-            # imprimindo a versão do SQLite
-            print("SQLite version: %s" % self.data, "\n")
-
         except sqlite3.Error:
             print("Erro ao abrir banco.")
             return False
@@ -216,6 +188,6 @@ class Connect():
     def close_db(self):
         if self.conn:
             self.conn.close()
-            print("Conexão fechada.")
+            
 
 
