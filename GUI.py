@@ -1,11 +1,13 @@
 from main import *
+import pathlib
 
 # Tkinter
 import tkinter as tk
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, filedialog, messagebox
 from tkcalendar import Calendar, DateEntry
 from datetime import datetime
+import shutil
 
 
 
@@ -14,11 +16,11 @@ window = Tk()
 
 class Funcoes():
 
-    def inicializar(self):
+    def inicializar(self, arg):
 
         self.SoftG4 = SoftG4()
 
-        self.SoftG4.extract_csv()
+        self.SoftG4.extract_csv(arg)
 
         self.SoftG4.Sql_scripts()
 
@@ -124,16 +126,44 @@ class Funcoes():
 
         self.calcular_viajens(self.calc_)
 
+    def importar(self):
+        origem = filedialog.askdirectory()
+        self.inicializar(origem)
+        self.menu_moto()
+
+    def create_dirs(self):
+        os.mkdir('data_csv')
+        os.mkdir('sql') 
+
+    def delete_files(self):
+        try:
+            shutil.rmtree('data_csv', ignore_errors=False, onerror=None)
+        except Exception:
+            pass
+            
+        try:
+            shutil.rmtree('sql', ignore_errors=False, onerror=None)
+        except Exception:
+            pass
+
+        try:
+            os.remove('BaseG4.db')
+        except Exception:
+            pass
 
 class Application(Funcoes):
 
     def __init__(self):
-        self.calc_ = []
 
-        self.inicializar()
+        self.delete_files()
+
+        self.create_dirs()
+
+        self.calc_ = []
         self.window = window
 
         self.tela()
+        self.menu_topo()
         self.frames_tela()
         self.textos()
         self.menu_moto()
@@ -145,6 +175,8 @@ class Application(Funcoes):
 
         window.mainloop()
 
+        self.delete_files()
+
     def tela(self):
         self.window.title("Soft G4")
         self.window.configure(background='#1e3743')
@@ -152,6 +184,22 @@ class Application(Funcoes):
         self.window.resizable(True, True)
         self.window.maxsize(width=800, height=600)
         self.window.minsize(width=500, height=400)
+
+    def menu_topo(self):
+
+        menubar = Menu(self.window, tearoff=0)
+
+        self.window.config(menu=menubar)
+
+        menu_arquivos = Menu(menubar, tearoff=0)
+        menu_ajuda = Menu(menubar, tearoff=0)
+
+        menu_arquivos.add_command(label="Importar", command=self.importar)
+        menu_arquivos.add_command(label="Exportar", command=None)
+        menu_arquivos.add_command(label="sair", command=None)
+
+        menubar.add_cascade(label="Arquivo", menu=menu_arquivos)
+        menubar.add_cascade(label="Ajuda", menu=menu_ajuda)
 
     def frames_tela(self):
 
@@ -168,18 +216,18 @@ class Application(Funcoes):
     def menu_moto(self):
 
         def list_moto():
-            list_ = []
+            list_ = [""]
             arquivos = os.listdir('data_csv/')
             [list_.append(str(i)[:-4].replace(" ", "_")) for i in arquivos]
             return list_
 
-        options = list_moto()
+        self.options_menu_moto = list_moto()
 
         self.drop_ = StringVar()
 
         self.drop_.set("MOTORISTA")
 
-        self.drop = OptionMenu(self.frame_1, self.drop_, *options)
+        self.drop = OptionMenu(self.frame_1, self.drop_, *self.options_menu_moto)
 
         self.drop.place(relx=0.05, rely = 0.1, relwidth = 0.40, relheight = 0.15)
 

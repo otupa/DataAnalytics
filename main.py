@@ -3,18 +3,17 @@ import pandas as pd
 from datetime import datetime, date, timedelta
 
 import sqlite3
+
 import csv
 import os
 import re
 
 try:
-    [os.remove('sql/schema_table.sql')]
-    [os.remove('BaseG4.db')]
+    os.remove('sql/schema_table.sql')
+    os.remove('BaseG4.db')
 except:
     True
 
-# Diretorio das conversas do whatsapp
-dir_conversas = 'conversas/'
 
 # Diretorio dos arquivos csv
 dir_csv = 'data_csv/'
@@ -23,9 +22,9 @@ dir_csv = 'data_csv/'
 dir_sql = 'sql/'
 
 # Trata e salva os dados em csv's
-class SoftG4():
-    
-    def extract_csv(self):
+class SoftG4():        
+
+    def extract_csv(self, dir_conversas):
         self.data_frame = []
 
         def filtrar(arg):
@@ -55,11 +54,11 @@ class SoftG4():
 
         def extrair(file):
             # Abre a conversa e cria uma lista que separa cada linha.
-            conversa = open(dir_conversas+file, 'r', 
+            conversa = open(os.path.join(dir_conversas, file), 'r', 
                 encoding = 'utf-8').read().splitlines()
 
             # Captura o nome que será usado para salvar o arquivo
-            nome_csv = os.path.basename(dir_conversas+file)[:-4][25:]
+            nome_csv = os.path.basename(dir_conversas+file)[9:][:-4][25:]
 
             print("Analisando: ", nome_csv)
 
@@ -75,6 +74,8 @@ class SoftG4():
             # Cria e salva um DataFrame Pandas em um arquico csv.
             [pd.DataFrame(self.data_frame).to_csv(dir_csv+nome_csv+'.csv', header=False, encoding='utf-8', index=False)]
             
+            
+
             #Fecha o DataFrame
             self.data_frame.clear()
 
