@@ -8,23 +8,17 @@ import csv
 import os
 import re
 
-try:
-    os.remove('sql/schema_table.sql')
-    os.remove('BaseG4.db')
-except:
-    True
-
-
-# Diretorio dos arquivos csv
-dir_csv = 'data_csv/'
 
 # Diretorio dos arquivos sql
-dir_sql = 'sql/'
+dir_sql = 'sql'
+
+format_csv = '.csv'
 
 # Trata e salva os dados em csv's
 class SoftG4():        
 
     def extract_csv(self, dir_conversas):
+
         self.data_frame = []
 
         def filtrar(arg):
@@ -71,13 +65,17 @@ class SoftG4():
             # Estrutura de laço que invoca a função filtrar.
             [filtrar(str(i)) for i in data_conversa_reais]
 
-            # Cria e salva um DataFrame Pandas em um arquico csv.
-            [pd.DataFrame(self.data_frame).to_csv(dir_csv+nome_csv+'.csv', header=False, encoding='utf-8', index=False)]
-            
-            
+            nome = os.path.join('data_csv', nome_csv+'.csv')
 
+            print(nome)
+
+            # Cria e salva um DataFrame Pandas em um arquico csv.
+            [pd.DataFrame(self.data_frame).to_csv((nome), header=False, encoding='utf-8', index=False)]
+            
             #Fecha o DataFrame
             self.data_frame.clear()
+
+        print(dir_conversas)
 
         [extrair(file) for file in os.listdir(dir_conversas)]
 
@@ -86,13 +84,13 @@ class SoftG4():
     def Sql_scripts(self):
 
         def write_sql_table(arg):
-            table = open(dir_sql+"schema_table.sql", "a")
+            table = open(os.path.join('sql', "schema_table.sql"), "a")
             schema_ = "CREATE TABLE {} (cod INTEGER PRIMARY KEY, data TEXT NOT NULL, hora INTEGER, valor VARCHAR(11) NOT NULl);\n".format(arg)
             table.write(schema_)
 
         def write_sql_insert(tb_name, name):
 
-            table = open('sql/'+name+".sql", "w")
+            table = open('sql/'+name+'.sql', "w")
 
             schema_ = "INSERT INTO {} (data, hora, valor) VALUES (?,?,?)".format(tb_name)
 
@@ -100,18 +98,20 @@ class SoftG4():
 
         def write_sql_search(tb_name):
 
-            table = open('sql/SEARCH_'+tb_name+'.sql', "w")
+            table = open(os.path.join('sql', 'SEARCH_'+tb_name+'.sql'), "w")
 
             schema_ = "SELECT cod, data, hora, valor FROM {} WHERE data=?".format(tb_name)
 
             table.write(schema_)
 
         # Para cada .csv em dir_csv aciona loop_dir
-        for file in os.listdir(dir_csv):
-            nome_csv = os.path.basename(dir_csv+file)[:-4]
+        for file in os.listdir('data_csv'):
+            nome_csv = os.path.basename(file)[:-4]
+            print(nome_csv)
 
             # Substitui espaços por _ para instanciar dentro do sqlite3
             name = nome_csv.replace(" ", "_")
+            print(name)
 
             # Invoca as funções write
             write_sql_table(name)
@@ -122,20 +122,20 @@ class SoftG4():
 
         # Cria as tabelas coms os scripts .sql
         def create_tables():
-            schemas = open('sql/schema_table.sql').read()
+            schemas = open(os.path.join('sql', 'schema_table.sql')).read()
+
             self.db.cursor.executescript(schemas)
 
         # Incere os dados do csv na respectiva tabela
         def csv_inject(arg):
 
             # Captura o nome do arquivo
-            name_csv = os.path.basename(dir_csv+arg)[:-4]
 
             # Abrir script Sqlite3
-            x = open('sql/'+name_csv+'.sql', 'r').read()
+            x = open(os.path.join('sql', arg[:-4]+'.sql'), 'r').read()
 
             # Abrir arquivo csv
-            reader = csv.reader(open(dir_csv+name_csv+'.csv', 'rt'), delimiter=',')
+            reader = csv.reader(open(os.path.join('data_csv', arg), 'rt'), delimiter=',')
 
             # Executa os camandos sql instanciando os dados do csv.
             [self.db.cursor.execute(x, linha) for linha in reader]
