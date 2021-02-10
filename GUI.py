@@ -1,15 +1,13 @@
-from main import *
+from SoftBackend import *
 import pathlib
-
+import shutil
+from math import ceil
 # Tkinter
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk, filedialog, messagebox
 from tkcalendar import Calendar, DateEntry
 from datetime import datetime
-import shutil
-
-
 
 
 window = Tk()
@@ -44,53 +42,105 @@ class Funcoes():
 
         for i in lista:
             self.calc_.append(i)
-        
+    
         self.connect.close_db()
 
     def calcular_viajens(self, lista):
         
-        # recebe uma lista com os registros
-        self.lista_resultados = []
         def receber_pesquisa(lista):
-            for item in lista:
-                # Item valor
-                valor = item[3]
-                # Filtra e transforma em inteiro
-                valor = int(valor[2:][:-3])
-                # Salva na lista
-                self.lista_resultados.append(valor)
+            try:
+                self.lista_resultados = []
+                self.lista_descontos = []
+                for item in lista:
+                    if item[3][:1] == "R":
+                        self.lista_resultados.append(item[3])
 
-        # Seleciona os valores sem repetilos
-        self.valor_resultados = []
-        def variaveis_precos():
-            for item in self.lista_resultados:
-                if item not in self.valor_resultados:
-                    self.valor_resultados.append(item)
 
-        self.valor_total_viajens = []
+                    elif item[3][:1] == "D":
+                        self.lista_descontos.append(item[3])
+                print("    --> Pesquisa recebida com sucesso", "\n")
+            except Exception as error:
+                print("     --> Erro ao receber pesquisa", "\n")
         
-        self.resultado_pesquisa = []
+        def variaveis_precos():
+            try:
+                self.lista_valor = []
+                for item in self.lista_resultados:
+                    if item not in self.lista_valor:
+                        self.lista_valor.append(item)
+                
+                self.lista_valor = sorted(self.lista_valor)
+                print("    --> Variaveis de preços coletadas com sucesso!", "\n")
+            except Exception as error:
+                print("    --> Erro ao consultar variaveis de preços: ", error, "\n")
+
+        def calcular_porcentagens(p_valor, p_total):
+            try:
+                p_valor = int(p_valor[2:][:-3])
+                
+                if p_valor == 10:
+                    porcent = p_total * 0.10
+                    porcent = round(porcent, 2)
+                    print("         --> Porcentagem: ", porcent)
+                    return porcent
+
+                elif p_valor <= 20:
+                    porcent = p_total * 0.15
+                    porcent = round(porcent, 2)
+                    print("         --> Porcentagem: ", porcent)
+                    return porcent
+
+                elif p_valor >= 20:
+                    porcent = p_total * 0.20
+                    porcent = round(porcent, 2)
+                    print("         --> Porcentagem: ", porcent)
+                    return porcent
+
+                print("    --> calcular porcentagens realizada com sucesso!", "\n")
+            except Exception as error:
+                print("    --> Erro ao calcular procentagem: ", error+":", p_valor, "\n")
+
+        def multiplicar(valor, quantidade):
+            total_mult = int(valor[2:][:-3]) * quantidade
+            print("    --> Valor total: ", str(valor)+"x"+str(quantidade)+"="+str(total_mult), "\n")
+            return total_mult
+
+        def quantidade_viajens():
+            
 
         def calcular_valores():
+            self.resultado_pesquisa = []
 
-            # Calculos
-            for valor in sorted(self.valor_resultados):
-                # Conta o numero de objetos na lista
-                quantidade_viajens = self.lista_resultados.count(valor)
+            try:
+                    # Calculos
+                for valor in self.lista_valor:
+                    try:
+                        # Conta o numero de objetos na lista
+                        quantidade_viajens = self.lista_resultados.count(valor)
+                        print("        --> Quantidade de viajens: ", quantidade_viajens, "\n")
+                    except Exception as error:
+                        print("        --> Erro em calcular quantidade de viajens: ", error, "\n")
+                        pass
 
-                # Multiplicando o valor pela quantidade de viajens
-                total = valor * quantidade_viajens
+                    # Multiplicando o valor pela quantidade de viajens
+                    mult_total = multiplicar(valor, quantidade_viajens)
 
-                self.valor_total_viajens.append(total)
+                    porcentagem = calcular_porcentagens(valor, int(mult_total))
 
-                schema = ["R$"+str(valor)+",00:", "x"+str(quantidade_viajens)+"  =","R$"+str(total)+",00"]
 
-                self.resultado_pesquisa.append(schema)
+                    schema = ["R$"+str(valor)+",00:", "x"+str(quantidade_viajens)+"  =","R$"+str(mult_total)+",00", str(porcentagem)]
+                    print(schema, "\n")
 
-            self.soma_valor_total_viajens = sum(self.valor_total_viajens)
+                    self.resultado_pesquisa.append(schema)
 
-            self.resultado_pesquisa.append(["Total:", len(self.lista_resultados) , "R$"+str(self.soma_valor_total_viajens)+",00"])
+                #self.soma_valor_total_viajens = sum(self.valor_total_viajens)
 
+                #self.resultado_pesquisa.append(
+                #   ["Total:", len(self.lista_resultados), 
+                #  "R$"+str(self.soma_valor_total_viajens)+",00", 
+                # "R$"+(str(sum(self.valor_total_porcentagens)))])
+            except Exception as error:
+                print("    --> Erro em calcular valores: ", error)
 
         receber_pesquisa(lista)
 
@@ -98,15 +148,18 @@ class Funcoes():
 
         calcular_valores()
 
+        # Incere os valores no Treeviw
         try:
             [self.Resultado.insert("", END, values=info) for info in self.resultado_pesquisa]
         except Exception as error:
-            print("Erro no Resultado: ", error)
+            print(" --> Erro no Resultado: ", error)
 
+        #lismpa as listas
         self.lista_resultados.clear()
-        self.valor_resultados.clear()
-        self.valor_total_viajens.clear()
+        #self.valor_resultados.clear()
+        #self.valor_total_viajens.clear()
         self.resultado_pesquisa.clear()
+        #self.valor_total_porcentagens.clear()
         self.calc_.clear()
 
     def pesquisar(self):
@@ -114,7 +167,6 @@ class Funcoes():
         self.listaCli.delete(*self.listaCli.get_children())
         self.Resultado.delete(*self.Resultado.get_children())
 
-        
         self.data_1 = self.calendar_1.get()
         self.data_2 = self.calendar_2.get()
 
@@ -151,6 +203,7 @@ class Funcoes():
         except Exception:
             pass
 
+    
 class Application(Funcoes):
 
     def __init__(self):
@@ -235,10 +288,10 @@ class Application(Funcoes):
         
         # Criando calendario
         self.calendar_1 = DateEntry(self.frame_1, width=12, background='#3D51C3', foreground='white', 
-            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2020, month=10, day=25)
+            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2021, month=1, day=31, date_pattern='dd/mm/Y')
 
         self.calendar_2 = DateEntry(self.frame_1, width=12, background='#3D51C3',foreground='white', 
-            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2020, month=12, day=9)
+            borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2021, month=2, day=7, date_pattern='dd/mm/Y')
 
         self.calendar_1.place(relx=0.05, rely=0.35, relwidth=0.19, relheight=0.1)
 
@@ -257,9 +310,9 @@ class Application(Funcoes):
 
         self.bt_pesquisar.place(relx=0.05, rely=0.5, relwidth=0.4, relheight=0.2)
 
-        self.bt_export_pdf.place(relx=0.05, rely=0.725, relwidth=0.19, relheight=0.15)
+        #self.bt_export_pdf.place(relx=0.05, rely=0.725, relwidth=0.19, relheight=0.15)
 
-        self.bt_exportar_todos.place(relx=0.26, rely=0.725, relwidth=0.19, relheight=0.15)
+        #self.bt_exportar_todos.place(relx=0.26, rely=0.725, relwidth=0.19, relheight=0.15)
 
     def textos(self):
 
@@ -291,14 +344,16 @@ class Application(Funcoes):
         self.Resultado.heading("#1", text="Valores")
         self.Resultado.heading("#2", text="N° de viajens")
         self.Resultado.heading("#3", text="Total")
+        self.Resultado.heading("#4", text="Porcentagens")
 
         self.Resultado.column("#0", width=0)
-        self.Resultado.column("#1", width=75)
-        self.Resultado.column("#2", width=100)
+        self.Resultado.column("#1", width=50)
+        self.Resultado.column("#2", width=50)
         self.Resultado.column("#3", width=75)
+        self.Resultado.column("#4", width=75)
         
-        self.Resultado.place(relx=0.50, rely=0.1, relwidth=0.435, relheight=0.785)
-        self.scroll_list.place(relx=0.93, rely=0.1, relwidth=0.025, relheight=0.785)
+        self.Resultado.place(relx=0.50, rely=0.1, relwidth=0.435, relheight=0.85)
+        self.scroll_list.place(relx=0.93, rely=0.1, relwidth=0.025, relheight=0.85)
 
     def Treeview_frame_2(self):
 
@@ -326,7 +381,7 @@ class Application(Funcoes):
         self.scroll_list.place(relx=0.96, rely=0.1, relwidth=0.03, relheight=0.85)
 
 
-a = Application()
+
 
 
 
