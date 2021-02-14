@@ -13,8 +13,6 @@ def iniciar():
         "\n",
         )
 
-
-
 if __name__ == '__main__':
     iniciar()
     a = Application()
