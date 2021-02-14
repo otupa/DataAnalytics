@@ -10,7 +10,7 @@ base = "Win32GUI"
 #    base = "Win32GUI"
 
 # Arquivo para criar executavel
-executables = [Executable("main.pyw", base=base)]
+executables = [Executable("main.pyw", base=base), icon="icon.ico"]
 
 # Bibliotecas do programa
 packages = ["tkinter", "tkcalendar", "pandas", "sqlite3"]
