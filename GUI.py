@@ -45,122 +45,168 @@ class Funcoes():
     
         self.connect.close_db()
 
-    def calcular_viajens(self, lista):
-        
-        def receber_pesquisa(lista):
-            try:
-                self.lista_resultados = []
-                self.lista_descontos = []
-                for item in lista:
-                    if item[3][:1] == "R":
-                        self.lista_resultados.append(item[3])
+    def calcular_viajens(self ,lista):
+        # Lista que recebe o conteudo do Treeview
+        lista_master = []
 
+        # Total de viajens
+        total_viajens = []
 
-                    elif item[3][:1] == "D":
-                        self.lista_descontos.append(item[3])
-                print("    --> Pesquisa recebida com sucesso", "\n")
-            except Exception as error:
-                print("     --> Erro ao receber pesquisa", "\n")
+        # Lista que recebe o valor de cada viajem
+        viajens_moto = []
+
+        # Porcrntagem paga pelo motorista
+        lucro = []
         
+        def receber_pesquisa():
+            lista_resultados = []
+            [lista_resultados.append(item[3]) for item in lista if item[3][:1] == "R"]
+            return lista_resultados
+
+        def receber_pesquisa_desc():
+            lista_descontos = []
+            [lista_descontos.append(item[3]) for item in lista if item[3][:1] == "D"]
+            return lista_descontos
+
         def variaveis_precos():
-            try:
-                self.lista_valor = []
-                for item in self.lista_resultados:
-                    if item not in self.lista_valor:
-                        self.lista_valor.append(item)
-                
-                self.lista_valor = sorted(self.lista_valor)
-                print("    --> Variaveis de preços coletadas com sucesso!", "\n")
-            except Exception as error:
-                print("    --> Erro ao consultar variaveis de preços: ", error, "\n")
+            lista_valor = []
+            [lista_valor.append(item) for item in receber_pesquisa() if item not in lista_valor]
+            lista_valor = sorted(lista_valor)
+            return lista_valor
+
+        def variaveis_precos_descontos():
+            lista_valor_desc = []
+            [lista_valor_desc.append(item) for item in receber_pesquisa_desc() if item not in lista_valor_desc]    
+            lista_valor_desc = sorted(lista_valor_desc)
+            return lista_valor_desc
 
         def calcular_porcentagens(p_valor, p_total):
-            try:
-                p_valor = int(p_valor[2:][:-3])
-                
-                if p_valor == 10:
-                    porcent = p_total * 0.10
-                    porcent = round(porcent, 2)
-                    print("         --> Porcentagem: ", porcent)
-                    return porcent
+            p_valor = int(p_valor[2:][:-3])
+            
+            if p_valor == 10:
+                porcent = p_total * 0.10
+                porcent = round(porcent, 2)
+                return porcent
 
-                elif p_valor <= 20:
-                    porcent = p_total * 0.15
-                    porcent = round(porcent, 2)
-                    print("         --> Porcentagem: ", porcent)
-                    return porcent
+            elif p_valor <= 20:
+                porcent = p_total * 0.15
+                porcent = round(porcent, 2)
+                return porcent
 
-                elif p_valor >= 20:
-                    porcent = p_total * 0.20
-                    porcent = round(porcent, 2)
-                    print("         --> Porcentagem: ", porcent)
-                    return porcent
+            elif p_valor >= 20:
+                porcent = p_total * 0.20
+                porcent = round(porcent, 2)
+                return porcent
 
-                print("    --> calcular porcentagens realizada com sucesso!", "\n")
-            except Exception as error:
-                print("    --> Erro ao calcular procentagem: ", error+":", p_valor, "\n")
+        def calcular_porcentagens_desc(p_valor, p_total):
+
+            p_valor = int(p_valor[3:][:-3])
+
+            if p_valor == 10:
+                porcent = p_total * -0.90
+                porcent = round(porcent, 2)
+                return porcent
+            
+            elif p_valor <= 20:
+                porcent = p_total * -0.85
+                porcent = round(porcent, 2)
+                return porcent
+
+            elif p_valor >= 20:
+                porcent = p_total * -0.80
+                porcent = round(porcent, 2)
+                return porcent
 
         def multiplicar(valor, quantidade):
             total_mult = int(valor[2:][:-3]) * quantidade
-            print("    --> Valor total: ", str(valor)+"x"+str(quantidade)+"="+str(total_mult), "\n")
             return total_mult
 
-        def quantidade_viajens():
-            
+        def multiplicar_desc(valor, quantidade):
+            total_mult = int(valor[3:][:-3]) * quantidade
+            return total_mult
 
-        def calcular_valores():
-            self.resultado_pesquisa = []
+        def schema_pesquisa():
+            # Percorre a lista valor calculando o que será exibido no  Treview do tkinter 
+            for valor in variaveis_precos():
 
-            try:
-                    # Calculos
-                for valor in self.lista_valor:
-                    try:
-                        # Conta o numero de objetos na lista
-                        quantidade_viajens = self.lista_resultados.count(valor)
-                        print("        --> Quantidade de viajens: ", quantidade_viajens, "\n")
-                    except Exception as error:
-                        print("        --> Erro em calcular quantidade de viajens: ", error, "\n")
-                        pass
+                # Conta a quantidade de viajens
+                quantidade_viajens = receber_pesquisa().count(valor)
 
-                    # Multiplicando o valor pela quantidade de viajens
-                    mult_total = multiplicar(valor, quantidade_viajens)
+                total_viajens.append(quantidade_viajens)
 
-                    porcentagem = calcular_porcentagens(valor, int(mult_total))
+                # Multiplicando o valor pela quantidade de viajens
+                mult_total = multiplicar(valor, quantidade_viajens)
+                
+                # Soma ao valor total
+                viajens_moto.append(mult_total)
 
+                # Calcula a porcentagem para cada valor
+                porcentagem = calcular_porcentagens(valor, mult_total)
 
-                    schema = ["R$"+str(valor)+",00:", "x"+str(quantidade_viajens)+"  =","R$"+str(mult_total)+",00", str(porcentagem)]
-                    print(schema, "\n")
+                lucro.append(porcentagem)
 
-                    self.resultado_pesquisa.append(schema)
+                # Esquema que será exibido no Treview do tkinter 
+                schema = [
+                    valor,                                  # valor
+                    "x "+str(quantidade_viajens)+"  =",     # quantidade de vianjens
+                    "R$"+str(mult_total)+",00",             # valor total das viajens
+                    "R$"+str(porcentagem)                   # porcentagem da empresa
+                    ]
 
-                #self.soma_valor_total_viajens = sum(self.valor_total_viajens)
+                lista_master.append(schema)
 
-                #self.resultado_pesquisa.append(
-                #   ["Total:", len(self.lista_resultados), 
-                #  "R$"+str(self.soma_valor_total_viajens)+",00", 
-                # "R$"+(str(sum(self.valor_total_porcentagens)))])
-            except Exception as error:
-                print("    --> Erro em calcular valores: ", error)
+        def schema_pesquisa_desc():
+            # Percorre a lista valor calculando o que será exibido no  Treview do tkinter 
+            for valor in variaveis_precos_descontos():
 
-        receber_pesquisa(lista)
+                # Conta a quantidade de viajens
+                quantidade_viajens = receber_pesquisa_desc().count(valor)
 
-        variaveis_precos()
+                total_viajens.append(quantidade_viajens)
 
-        calcular_valores()
+                # Multiplicando o valor pela quantidade de viajens
+                mult_total = multiplicar_desc(valor, quantidade_viajens)
+                
+                # Soma ao valor total
+                viajens_moto.append(mult_total)
 
-        # Incere os valores no Treeviw
-        try:
-            [self.Resultado.insert("", END, values=info) for info in self.resultado_pesquisa]
-        except Exception as error:
-            print(" --> Erro no Resultado: ", error)
+                # Calcula a porcentagem para cada valor
+                porcentagem_desc = calcular_porcentagens_desc(valor, mult_total)
 
-        #lismpa as listas
-        self.lista_resultados.clear()
-        #self.valor_resultados.clear()
-        #self.valor_total_viajens.clear()
-        self.resultado_pesquisa.clear()
-        #self.valor_total_porcentagens.clear()
-        self.calc_.clear()
+                lucro.append(porcentagem_desc)
+
+                # Esquema que será exibido no Treview do tkinter 
+                schema = [
+                    valor,                                  # valor
+                    "x "+str(quantidade_viajens)+"  =",     # quantidade de vianjens
+                    "R$"+str(mult_total)+",00",             # valor total das viajens
+                    "R$"+str(porcentagem_desc)                   # porcentagem da empresa
+                    ]
+
+                lista_master.append(schema)
+
+        def schema_pesquisa_total():
+
+            # Soma o valor total do lucro da empresa
+            soma_total_viajens = sum(viajens_moto)
+
+            # Insere na lista principal o esquema com:
+            lista_master.append([
+                "Total:",                                       #
+                "x "+str(sum(total_viajens)),                   # total de viajens
+                "R$"+str(soma_total_viajens)+",00",             # total faturada pelo motorista
+                "R$"+str(sum(lucro))                            # total da porcentagem da empresa
+                ])
+
+        def main():
+            schema_pesquisa()
+            schema_pesquisa_desc()
+            schema_pesquisa_total()
+            [self.Resultado.insert("", END, values=info) for info in lista_master]
+
+            self.calc_.clear()
+
+        main()
 
     def pesquisar(self):
 
@@ -203,7 +249,6 @@ class Funcoes():
         except Exception:
             pass
 
-    
 class Application(Funcoes):
 
     def __init__(self):
@@ -213,6 +258,7 @@ class Application(Funcoes):
         self.create_dirs()
 
         self.calc_ = []
+
         self.window = window
 
         self.tela()
