@@ -1,28 +1,16 @@
 import pandas as pd
-
 from datetime import datetime, date, timedelta
-
 import sqlite3
-
 import csv
 import os
 import re
 
-
-# Diretorio dos arquivos sql
-dir_sql = 'sql'
-
-format_csv = '.csv'
-
-# Trata e salva os dados em csv's
 class SoftG4():        
 
     def extract_csv(self, dir_conversas):
-
         self.data_frame = []
 
         def filtrar(arg):
-
             try:
                 if 'desconto no boleto' in arg:
 
@@ -194,11 +182,8 @@ class SoftG4():
             data_inicio += incremento
         return lista_datas
 
-
 class Connect():
-
     def __init__(self):
-
         try:
             # conectando...
             self.conn = sqlite3.connect('BaseG4.db')
@@ -216,6 +201,3 @@ class Connect():
     def close_db(self):
         if self.conn:
             self.conn.close()
-            
-
-
