@@ -69,7 +69,7 @@ class SoftG4():
                 encoding = 'utf-8').read().splitlines()
 
             # Captura o nome que será usado para salvar o arquivo
-            nome_csv = os.path.basename(dir_conversas+file)[6:][:-4][25:]
+            nome_csv = os.path.basename(dir_conversas+file)[10:][:-4][25:]
 
             print("     --> Analisando: ", nome_csv, '\n')
 

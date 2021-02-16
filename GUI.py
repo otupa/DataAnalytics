@@ -45,7 +45,7 @@ class Funcoes():
     
         self.connect.close_db()
 
-    def calcular_viajens(self ,lista):
+    def calcular_viajens(self , lista):
         # Lista que recebe o conteudo do Treeview
         lista_master = []
 
@@ -195,7 +195,7 @@ class Funcoes():
                 "Total:",                                       #
                 "x "+str(sum(total_viajens)),                   # total de viajens
                 "R$"+str(soma_total_viajens)+",00",             # total faturada pelo motorista
-                "R$"+str(sum(lucro))                            # total da porcentagem da empresa
+                "R$"+str(round(sum(lucro), 2))                            # total da porcentagem da empresa
                 ])
 
         def main():
@@ -204,11 +204,49 @@ class Funcoes():
             schema_pesquisa_total()
             [self.Resultado.insert("", END, values=info) for info in lista_master]
 
-            self.calc_.clear()
-
         main()
+        return lista_master
+
+    def gerar_analise(self):
+
+        self.data_1 = self.calendar_1.get()
+        self.data_2 = self.calendar_2.get()
+
+        dates = self.SoftG4.date_generator(self.data_1, self.data_2)
+
+        destino = filedialog.askdirectory()
+
+        try:
+            for file in os.listdir('data_csv'):
+
+                nome = file[:-4].replace(" ", "_")
+
+                paterns = "{}".format(nome), str(self.data_1), str(self.data_2), " "
+
+                [self.select_tb(nome, date) for date in dates]
+
+                resultado = self.calcular_viajens(self.calc_)
+
+                resultado.insert(0, paterns)
+
+                resultado.insert(1, ("Valor","N viajens","total","Porcentagem"))
+
+                local = os.path.join(destino, nome+'.csv')
+
+                [pd.DataFrame(resultado).to_csv(local, header=False, encoding='utf-8', index=False)]
+
+                self.calc_.clear()
+
+            self.listaCli.delete(*self.listaCli.get_children())
+            self.Resultado.delete(*self.Resultado.get_children())
+
+        except Exception as error:
+            print("error: ", error)
+
 
     def pesquisar(self):
+
+        self.calc_.clear()
 
         self.listaCli.delete(*self.listaCli.get_children())
         self.Resultado.delete(*self.Resultado.get_children())
@@ -352,13 +390,13 @@ class Application(Funcoes):
             bg='#364094', fg='white', font=('verdana', 8, 'bold'), command=None)
 
         self.bt_exportar_todos = Button(self.frame_1, text="EXPORTAR TUDO", bd=2, 
-            bg='#D92A2A', fg='white', font=('verdana', 8, 'bold'), command=None)
+            bg='#D92A2A', fg='white', font=('verdana', 8, 'bold'), command=self.gerar_analise)
 
         self.bt_pesquisar.place(relx=0.05, rely=0.5, relwidth=0.4, relheight=0.2)
 
-        #self.bt_export_pdf.place(relx=0.05, rely=0.725, relwidth=0.19, relheight=0.15)
+        self.bt_export_pdf.place(relx=0.05, rely=0.725, relwidth=0.19, relheight=0.15)
 
-        #self.bt_exportar_todos.place(relx=0.26, rely=0.725, relwidth=0.19, relheight=0.15)
+        self.bt_exportar_todos.place(relx=0.26, rely=0.725, relwidth=0.19, relheight=0.15)
 
     def textos(self):
 

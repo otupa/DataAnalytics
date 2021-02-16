@@ -10,13 +10,13 @@ base = "Win32GUI"
 #    base = "Win32GUI"
 
 # Arquivo para criar executavel
-executables = [Executable("main.pyw", base=base), icon="icon.ico"]
+executables = [Executable("main.py", base=base, icon="icon.ico")]
 
 # Bibliotecas do programa
 packages = ["tkinter", "tkcalendar", "pandas", "sqlite3"]
 
 # Arquivos nescessarios
-files = ['SoftBackend.pyw', 'GUI.pyw']
+files = ['SoftBackend.py', 'GUI.py']
 
 # Opções do cx_Freeze
 options = {
@@ -44,7 +44,7 @@ setup(
     options = options,
 
     # Versão
-    version = "BETE 1.0",
+    version = "1.0",
 
     # Descrição
     description = 'Softwere de genrenciamento de corridas de aplicativo',
