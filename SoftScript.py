@@ -1,6 +1,8 @@
+import shutil
+import sqlite3
+import pandas as pd
 import os
 import re
-import pandas as pd
 
 
 
@@ -10,7 +12,13 @@ class SoftScript():
 
         self.data_frame = []
 
+        self.delete_files()
+        self.create_dirs()
+        
         a = self.read_directory(self.extract_archives, "C:\\Users\\User\\Desktop\\so")
+
+        
+        #self.delete_files()
 
 
     def filter_infos(self, arg):
@@ -22,18 +30,15 @@ class SoftScript():
                 r = [data[0], hora[0], valor[0]]
 
                 if not r[0]: r[0] = self.data_frame[-1][0]
-                    
-                if state == 1: r[2] = "DR$"+r[2][:-6]+",00"
-                        
+
+                if state == 1: r[2] = "DR$"+r[2][:-6]+",00" 
                 else: r[2] = "R$"+r[2][:-6]+",00"
                     
                 self.data_frame.append(r)
 
-            except Exception as error:
-                print(error)
-
+            except Exception as error: print(error)
+               
         if 'desconto no boleto' in arg: pick_regex(arg, state=1)
-            
         else: pick_regex(arg)
             
 
@@ -67,17 +72,12 @@ class SoftScript():
 
 
     def create_dirs(self):
-        os.mkdir('data_csv')
-        os.mkdir('sql') 
+        os.mkdir('data_csv') if True else None
+        os.mkdir('sql') if True else None
 
 
     def delete_files(self):
-        try: shutil.rmtree('data_csv', ignore_errors=False, onerror=None)
-        except Exception: pass
-            
-        try: shutil.rmtree('sql', ignore_errors=False, onerror=None)
-        except Exception: pass
-            
+        shutil.rmtree('data_csv', ignore_errors=True, onerror=None)
+        shutil.rmtree('sql', ignore_errors=True, onerror=None)
         try: os.remove('BaseG4.db')
-        except Exception: pass
-            
+        except: True
