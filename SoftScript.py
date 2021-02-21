@@ -18,7 +18,7 @@ class SoftScript():
         a = self.read_directory(self.extract_archives, "C:\\Users\\User\\Desktop\\so")
 
         
-        #self.delete_files()
+        self.delete_files()
 
 
     def filter_infos(self, arg):
@@ -81,3 +81,23 @@ class SoftScript():
         shutil.rmtree('sql', ignore_errors=True, onerror=None)
         try: os.remove('BaseG4.db')
         except: True
+
+
+class Connect():
+    def __init__(self):
+        try:
+            # conectando...
+            self.conn = sqlite3.connect('BaseG4.db')
+            self.cursor = self.conn.cursor()
+        except sqlite3.Error:
+            print(" --> Erro ao abrir banco.")
+            return False
+        
+    # Salva modificações na db
+    def commit_db(self):
+        if self.conn:self.conn.commit()
+            
+
+    # Fecha conexão com a base de dados
+    def close_db(self):
+        if self.conn:self.conn.close()
