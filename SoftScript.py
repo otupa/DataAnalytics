@@ -86,6 +86,8 @@ class SoftScript():
             initial_date += increment
         return list_dates
 
+    
+
 
 class Sqlite_3(SoftScript):
     def __init__(self):
@@ -167,3 +169,5 @@ class Sqlite_3(SoftScript):
         self.read_directory(csv_inject, 'data_csv')
 
         self.db.close_db()
+
+

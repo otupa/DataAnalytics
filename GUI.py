@@ -8,7 +8,208 @@ from tkinter import ttk, filedialog, messagebox
 from tkcalendar import Calendar, DateEntry
 from datetime import datetime
 
-class Application():
+
+
+class Connections:
+    def start_extract(self):
+
+        self.backend = SoftScript()
+        self.app_db = Sqlite_3()
+
+        self.directory = filedialog.askdirectory()
+
+        self.backend.read_directory(self.backend.extract_archives, self.directory, state=1)
+
+        self.app_db.sql_scripts()
+
+        self.app_db.sql_insert()
+
+        self.Menu_moto()
+
+
+    def search(self):
+
+        self.calc_.clear()
+
+        self.listaCli.delete(*self.listaCli.get_children())
+        self.Resultado.delete(*self.Resultado.get_children())
+
+        self.date_one = self.calendar_one.get()
+        self.date_two = self.calendar_two.get()
+
+        name = self.drop_.get()
+
+        dates = self.backend.date_generator(self.date_one, self.date_two)
+
+        [self.select_tb(name, date) for date in dates]
+
+        self.calculate_runs(self.calc_)
+
+
+    def calculate_runs(self , lista):
+        # Lista que recebe o conteudo do Treeview
+        master_list = []
+
+        # Total de viajens
+        total_runs = []
+
+        # Lista que recebe o valor de cada viajem
+        moto_runs = []
+
+        # Porcrntagem paga pelo motorista
+        moto_porcent = []
+        
+        def recive_search():
+            result_list = []
+            [result_list.append(item[3]) for item in lista if item[3][:1] == "R"]
+            return result_list
+
+        def recive_desc_search():
+            descont_list = []
+            [descont_list.append(item[3]) for item in lista if item[3][:1] == "D"]
+            return descont_list
+
+        def valor_variant():
+            valor_list = []
+            [valor_list.append(item) for item in recive_search() if item not in valor_list]
+            valor_list = sorted(valor_list)
+            return valor_list
+
+        def valor_variant_desc():
+            desc_valor_list = []
+            [desc_valor_list.append(item) for item in recive_desc_search() if item not in desc_valor_list]    
+            desc_valor_list = sorted(desc_valor_list)
+            return desc_valor_list
+
+        def calc_porcent(p_valor, p_total):
+            p_valor = int(p_valor[2:][:-3])
+            
+            if p_valor == 10:
+                porcent = p_total * 0.10
+                porcent = round(porcent, 2)
+                return porcent
+
+            elif p_valor <= 19:
+                porcent = p_total * 0.15
+                porcent = round(porcent, 2)
+                return porcent
+
+            elif p_valor >= 20:
+                porcent = p_total * 0.20
+                porcent = round(porcent, 2)
+                return porcent
+
+        def calc_desc_porcent(p_valor, p_total):
+
+            p_valor = int(p_valor[3:][:-3])
+
+            if p_valor == 10:
+                porcent = p_total * -0.90
+                porcent = round(porcent, 2)
+                return porcent
+            
+            elif p_valor <= 19:
+                porcent = p_total * -0.85
+                porcent = round(porcent, 2)
+                return porcent
+
+            elif p_valor >= 20:
+                porcent = p_total * -0.80
+                porcent = round(porcent, 2)
+                return porcent
+
+        def mult(valor, amount):
+            total_mult = int(valor[2:][:-3]) * amount
+            return total_mult
+
+        def mult_desc(valor, amount):
+            total_mult = int(valor[3:][:-3]) * amount
+            return total_mult
+
+        def schema_pesquisa():
+            # Percorre a lista valor calculando o que será exibido no  Treview do tkinter 
+            for valor in valor_variant():
+
+                # Conta a quantidade de viajens
+                amount_runs = recive_search().count(valor)
+
+                total_runs.append(amount_runs)
+
+                # Multiplicando o valor pela quantidade de viajens
+                mult_total = mult(valor, amount_runs)
+                
+                # Soma ao valor total
+                moto_runs.append(mult_total)
+
+                # Calcula a porcentagem para cada valor
+                porcenting = calc_porcent(valor, mult_total)
+
+                moto_porcent.append(porcenting)
+
+                # Esquema que será exibido no Treview do tkinter 
+                schema = [
+                    valor,                                  # valor
+                    "x "+str(amount_runs)+"  =",     # quantidade de vianjens
+                    "R$"+str(mult_total)+",00",             # valor total das viajens
+                    "R$"+str(porcenting)                   # porcentagem da empresa
+                    ]
+
+                master_list.append(schema)
+
+        def schema_search_desc():
+            # Percorre a lista valor calculando o que será exibido no  Treview do tkinter 
+            for valor in valor_variant_desc():
+
+                # Conta a quantidade de viajens
+                amount_runs = recive_desc_search().count(valor)
+
+                total_runs.append(amount_runs)
+
+                # Multiplicando o valor pela quantidade de viajens
+                mult_total = mult_desc(valor, amount_runs)
+                
+                # Soma ao valor total
+                moto_runs.append(mult_total)
+
+                # Calcula a porcentagem para cada valor
+                porcent_desc = calc_desc_porcent(valor, mult_total)
+
+                moto_porcent.append(porcent_desc)
+
+                # Esquema que será exibido no Treview do tkinter 
+                schema = [
+                    valor,                                  # valor
+                    "x "+str(amount_runs)+"  =",            # quantidade de vianjens
+                    "R$"+str(mult_total)+",00",             # valor total das viajens
+                    "R$"+str(porcent_desc)              # porcentagem da empresa
+                    ]
+
+                master_list.append(schema)
+
+        def schema_search_total():
+
+            # Soma o valor total do lucro da empresa
+            sum_total_runs = sum(moto_runs)
+
+            # Insere na lista principal o esquema com:
+            master_list.append([
+                "Total:",                                       #
+                "x "+str(sum(total_runs)),                   # total de viajens
+                "R$"+str(sum_total_runs)+",00",             # total faturada pelo motorista
+                "R$"+str(round(sum(moto_porcent), 2))                            # total da porcentagem da empresa
+                ])
+
+        def main():
+            schema_pesquisa()
+            schema_search_desc()
+            schema_search_total()
+            [self.Resultado.insert("", END, values=info) for info in master_list]
+
+        main()
+        return master_list
+
+
+class Application(Connections):
     def __init__(self):
         self.calc_ = []
         self.window = window = Tk()
@@ -32,7 +233,7 @@ class Application():
         menu_arquivos = Menu(menubar, tearoff=0)
         menu_ajuda = Menu(menubar, tearoff=0)
 
-        menu_arquivos.add_command(label="Importar", command=None)
+        menu_arquivos.add_command(label="Importar", command=self.start_extract)
         menu_arquivos.add_command(label="Exportar", command=None)
         menu_arquivos.add_command(label="sair", command=None)
 
@@ -75,21 +276,21 @@ class Application():
     def Calendar(self):
         
         # Criando calendario
-        self.calendar_1 = DateEntry(self.frame_1, width=12, background='#3D51C3', foreground='white', 
+        self.calendar_one = DateEntry(self.frame_1, width=12, background='#3D51C3', foreground='white', 
             borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2021, month=1, day=31, date_pattern='dd/mm/Y')
 
-        self.calendar_2 = DateEntry(self.frame_1, width=12, background='#3D51C3',foreground='white', 
+        self.calendar_two = DateEntry(self.frame_1, width=12, background='#3D51C3',foreground='white', 
             borderwidth=2, font="Arial 12", selectmode='day', cursor="hand1", year=2021, month=2, day=7, date_pattern='dd/mm/Y')
 
-        self.calendar_1.place(relx=0.05, rely=0.35, relwidth=0.19, relheight=0.1)
+        self.calendar_one.place(relx=0.05, rely=0.35, relwidth=0.19, relheight=0.1)
 
-        self.calendar_2.place(relx=0.26, rely=0.35, relwidth=0.19, relheight=0.1)
+        self.calendar_two.place(relx=0.26, rely=0.35, relwidth=0.19, relheight=0.1)
 
 
     def Buttons(self):
 
         self.bt_pesquisar = Button(self.frame_1, text="PESQUISAR", bd=2, 
-            bg='#364094', fg='white', font=('verdana', 10, 'bold'), command=None)
+            bg='#364094', fg='white', font=('verdana', 10, 'bold'), command=self.search)
 
         self.bt_export_pdf = Button(self.frame_1, text="EXPORTAR PDF", bd=2, 
             bg='#364094', fg='white', font=('verdana', 8, 'bold'), command=None)
@@ -171,9 +372,3 @@ class Application():
         self.listaCli.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
 
         self.scroll_list.place(relx=0.96, rely=0.1, relwidth=0.03, relheight=0.85)
-
-
-
-
-
-
