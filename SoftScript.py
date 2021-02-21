@@ -60,6 +60,24 @@ class SoftScript():
 
         self.data_frame.clear()
 
+
     def read_directory(self, func, directory):
         for i in os.listdir(directory):
             func(i, directory)
+
+
+    def create_dirs(self):
+        os.mkdir('data_csv')
+        os.mkdir('sql') 
+
+
+    def delete_files(self):
+        try: shutil.rmtree('data_csv', ignore_errors=False, onerror=None)
+        except Exception: pass
+            
+        try: shutil.rmtree('sql', ignore_errors=False, onerror=None)
+        except Exception: pass
+            
+        try: os.remove('BaseG4.db')
+        except Exception: pass
+            
