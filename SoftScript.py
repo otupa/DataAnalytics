@@ -1,6 +1,7 @@
-import shutil
-import sqlite3
+from datetime import datetime, date, timedelta
 import pandas as pd
+import sqlite3
+import shutil
 import csv
 import os
 import re
@@ -72,6 +73,20 @@ class SoftScript():
         shutil.rmtree('sql', ignore_errors=True, onerror=None)
         try: os.remove('database.db')
         except: pass
+
+    def date_generator(self, date_one, date_two):
+        initial_date = datetime.strptime(date_one, '%d/%m/%Y').date()
+        final_date = datetime.strptime(date_two, '%d/%m/%Y').date()
+
+        # crio somente 1 timedelta (de 1 dia)
+        increment = timedelta(days=1)
+
+        list_dates = []
+        # vou somando 1 dia na data_inicio, até que ela seja maior que data_fim
+        while initial_date <= final_date:
+            list_dates.append(initial_date.strftime('%d/%m/%Y'))
+            initial_date += increment
+        return list_dates
 
 
 class Sqlite_3(SoftScript):
