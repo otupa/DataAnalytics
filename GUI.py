@@ -11,18 +11,20 @@ from datetime import datetime
 
 
 class Connections:
-    def start_extract(self):
 
-        self.backend = SoftScript()
-        self.app_db = Sqlite_3()
+    def close(self):
+        self.database.close_db()
+        self.backend.delete_files()
+
+    def start_extract(self):
 
         self.directory = filedialog.askdirectory()
 
         self.backend.read_directory(self.backend.extract_archives, self.directory, state=1)
 
-        self.app_db.sql_scripts()
+        self.database.sql_scripts()
 
-        self.app_db.sql_insert()
+        self.database.sql_insert()
 
         self.Menu_moto()
 
@@ -31,7 +33,7 @@ class Connections:
 
         self.calc_.clear()
 
-        self.listaCli.delete(*self.listaCli.get_children())
+        self.Result_db_serch.delete(*self.Result_db_serch.get_children())
         self.Resultado.delete(*self.Resultado.get_children())
 
         self.date_one = self.calendar_one.get()
@@ -45,6 +47,24 @@ class Connections:
 
         self.calculate_runs(self.calc_)
 
+    def connect_sql(self): self.connect = Sqlite_3()
+
+    def select_tb(self, nome_moto, data):
+        
+        self.connect_sql()
+
+        schema = open('sql/SEARCH_'+nome_moto+'.sql').read()
+
+        lista_treeview = self.connect.cursor.execute(schema, (data,))
+
+        [self.Result_db_serch.insert("", END, values=info) for info in lista_treeview]
+
+        lista = self.connect.cursor.execute(schema, (data,))
+
+        for i in lista:
+            self.calc_.append(i)
+    
+        self.connect.close_db()
 
     def calculate_runs(self , lista):
         # Lista que recebe o conteudo do Treeview
@@ -212,7 +232,29 @@ class Connections:
 class Application(Connections):
     def __init__(self):
         self.calc_ = []
+
         self.window = window = Tk()
+        
+        self.backend = SoftScript()
+        self.database = Sqlite_3()
+
+        self.backend.create_dirs()
+
+        self.Master_window()
+        self.Frames_window()
+
+        self.Treeview_frame_1()
+        self.Treeview_frame_2()
+
+        self.Menu_top()
+        self.Labels()
+        self.Menu_moto()
+        self.Calendar()
+        self.Buttons()
+
+        self.window.mainloop()
+
+        self.close()
 
 
     def Master_window(self):
@@ -258,8 +300,8 @@ class Application(Connections):
 
         def list_moto():
             list_ = [""]
-            arquivos = os.listdir('data_csv/')
-            [list_.append(str(i)[:-4].replace(" ", "_")) for i in arquivos]
+            directory = os.listdir('data_csv/')
+            [list_.append(str(i)[:-4].replace(" ", "_")) for i in directory]
             return list_
 
         self.options_menu_moto = list_moto()
@@ -350,25 +392,25 @@ class Application(Connections):
 
     def Treeview_frame_2(self):
 
-        self.listaCli = ttk.Treeview(self.frame_2, height=3, 
+        self.Result_db_serch = ttk.Treeview(self.frame_2, height=3, 
             column=("coll1", "coll2", "coll3", "coll4"))
 
-        self.scroll_list = Scrollbar(self.frame_2, orient='vertical', command=self.listaCli.yview)
+        self.scroll_list = Scrollbar(self.frame_2, orient='vertical', command=self.Result_db_serch.yview)
 
-        self.listaCli.configure(yscrollcommand=self.scroll_list.set)
+        self.Result_db_serch.configure(yscrollcommand=self.scroll_list.set)
 
-        self.listaCli.heading("#0", text="")
-        self.listaCli.heading("#1", text="cod")
-        self.listaCli.heading("#2", text="data")
-        self.listaCli.heading("#3", text="hora")
-        self.listaCli.heading("#4", text="valor")
+        self.Result_db_serch.heading("#0", text="")
+        self.Result_db_serch.heading("#1", text="cod")
+        self.Result_db_serch.heading("#2", text="data")
+        self.Result_db_serch.heading("#3", text="hora")
+        self.Result_db_serch.heading("#4", text="valor")
 
-        self.listaCli.column("#0", width=0)
-        self.listaCli.column("#1", width=10)
-        self.listaCli.column("#2", width=45)
-        self.listaCli.column("#3", width=45)
-        self.listaCli.column("#4", width=45)
+        self.Result_db_serch.column("#0", width=0)
+        self.Result_db_serch.column("#1", width=10)
+        self.Result_db_serch.column("#2", width=45)
+        self.Result_db_serch.column("#3", width=45)
+        self.Result_db_serch.column("#4", width=45)
 
-        self.listaCli.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
+        self.Result_db_serch.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
 
         self.scroll_list.place(relx=0.96, rely=0.1, relwidth=0.03, relheight=0.85)
