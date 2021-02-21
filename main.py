@@ -1,32 +1,31 @@
-
+from GUI import *
 from SoftScript import *
 
-def iniciar():
+def main():
+    soft = SoftScript()
+    soft.delete_files()
+    soft.create_dirs()
 
-    print()
+def gui():
+    gui = Application()
+    gui.Master_window()
+    gui.Frames_window()
 
-    print(
-        "   ##################################",
-        "\n",
-        "  - - - - - - - SoftG4 - - - - - - -",
-        "\n",
-        "  ##################################",
-        "\n",
-        )
+    gui.Treeview_frame_1()
+    gui.Treeview_frame_2()
+
+    gui.Menu_top()
+    gui.Labels()
+    gui.Menu_moto()
+    gui.Calendar()
+    gui.Buttons()
+
+    gui.window.mainloop()
 
 if __name__ == '__main__':
-    iniciar()
-    a = SoftScript()
-    a.delete_files()
+    main()
+    gui()
 
-    b = Sqlite_3()
 
-    a.create_dirs()
+
     
-    a.read_directory(a.extract_archives, "C:\\Users\\User\\Desktop\\so", state=1)
-
-    b.sql_scripts()
-    b.sql_insert()
-    b.close_db()
-
-    a.delete_files()

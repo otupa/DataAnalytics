@@ -7,8 +7,6 @@ import os
 import re
 
 
-
-
 class SoftScript():
     def __init__(self):
         self.data_frame = []
