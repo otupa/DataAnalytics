@@ -12,10 +12,6 @@ from datetime import datetime
 
 class Connections:
 
-    def close(self):
-        self.database.close_db()
-        self.backend.delete_files()
-
     def start_extract(self):
 
         self.directory = filedialog.askdirectory()
@@ -234,10 +230,11 @@ class Application(Connections):
         self.calc_ = []
 
         self.window = window = Tk()
-        
+
         self.backend = SoftScript()
         self.database = Sqlite_3()
 
+        self.backend.delete_files()
         self.backend.create_dirs()
 
         self.Master_window()
@@ -254,7 +251,8 @@ class Application(Connections):
 
         self.window.mainloop()
 
-        self.close()
+        self.database.close_db()
+        self.backend.delete_files()
 
 
     def Master_window(self):

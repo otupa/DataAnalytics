@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime, date, timedelta
+from unidecode import unidecode
 import pandas as pd
 import sqlite3
 import shutil
@@ -10,6 +13,7 @@ import re
 class SoftScript():
     def __init__(self):
         self.data_frame = []
+ 
 
     def filter_infos(self, arg):
         def pick_regex(arg, state=None):
@@ -26,8 +30,8 @@ class SoftScript():
                     
                 self.data_frame.append(r)
 
-            except Exception as error: print(error)
-               
+            except Exception as error: print(" --> Algo incomun em:", arg)
+             
         if 'desconto no boleto' in arg: pick_regex(arg, state=1)
         else: pick_regex(arg)
             
@@ -44,7 +48,12 @@ class SoftScript():
         info = capture_info(archive, "G4 MOBILE:")
         trated_info = capture_info(info, "reais")
 
-        archive_name = os.path.basename(directory+file)[6:][:-4][25:]
+        archive_name = os.path.basename(directory+unidecode(file))[6:][:-4][25:]
+
+
+        print()
+        print("Archives from: ", archive_name)
+
         csv_name = os.path.join('data_csv', archive_name+'.csv')
 
         for i in trated_info:
@@ -62,8 +71,10 @@ class SoftScript():
 
 
     def create_dirs(self):
-        os.mkdir('data_csv') if True else None
-        os.mkdir('sql') if True else None
+        try: os.mkdir('data_csv')
+        except: print()
+        try: os.mkdir('sql')
+        except: pass
 
 
     def delete_files(self):
@@ -86,8 +97,6 @@ class SoftScript():
             initial_date += increment
         return list_dates
 
-    
-
 
 class Sqlite_3(SoftScript):
     def __init__(self):
@@ -99,6 +108,7 @@ class Sqlite_3(SoftScript):
             print(" --> Erro ao abrir banco.")
             return False
         
+
     # Salva modificações na db
     def commit_db(self):
         if self.conn:self.conn.commit()
@@ -107,6 +117,7 @@ class Sqlite_3(SoftScript):
     # Fecha conexão com a base de dados
     def close_db(self):
         if self.conn:self.conn.close()
+
 
     def sql_scripts(self):
 
@@ -138,6 +149,7 @@ class Sqlite_3(SoftScript):
             write_sql_search(name)
 
         self.read_directory(main, 'data_csv')
+
 
     def sql_insert(self):
 
