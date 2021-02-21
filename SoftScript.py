@@ -1,6 +1,7 @@
 import shutil
 import sqlite3
 import pandas as pd
+import csv
 import os
 import re
 
@@ -9,17 +10,7 @@ import re
 
 class SoftScript():
     def __init__(self):
-
         self.data_frame = []
-
-        self.delete_files()
-        self.create_dirs()
-        
-        a = self.read_directory(self.extract_archives, "C:\\Users\\User\\Desktop\\so")
-
-        
-        self.delete_files()
-
 
     def filter_infos(self, arg):
         def pick_regex(arg, state=None):
@@ -66,9 +57,9 @@ class SoftScript():
         self.data_frame.clear()
 
 
-    def read_directory(self, func, directory):
+    def read_directory(self, func, directory, state=None):
         for i in os.listdir(directory):
-            func(i, directory)
+            func(i) if state == None else func(i, directory) 
 
 
     def create_dirs(self):
@@ -79,15 +70,15 @@ class SoftScript():
     def delete_files(self):
         shutil.rmtree('data_csv', ignore_errors=True, onerror=None)
         shutil.rmtree('sql', ignore_errors=True, onerror=None)
-        try: os.remove('BaseG4.db')
-        except: True
+        try: os.remove('database.db')
+        except: pass
 
 
-class Connect():
+class Sqlite_3(SoftScript):
     def __init__(self):
         try:
             # conectando...
-            self.conn = sqlite3.connect('BaseG4.db')
+            self.conn = sqlite3.connect('database.db')
             self.cursor = self.conn.cursor()
         except sqlite3.Error:
             print(" --> Erro ao abrir banco.")
@@ -101,3 +92,65 @@ class Connect():
     # Fecha conexão com a base de dados
     def close_db(self):
         if self.conn:self.conn.close()
+
+    def sql_scripts(self):
+
+        def write_sql_table(arg):
+            table = open(os.path.join('sql', "schema_table.sql"), "a")
+            schema_ = "CREATE TABLE IF NOT EXISTS {} (cod INTEGER PRIMARY KEY, data TEXT NOT NULL, hora INTEGER, valor VARCHAR(11) NOT NULl);\n".format(arg)
+            table.write(schema_)
+
+        def write_sql_insert(tb_name, name):
+
+            table = open('sql/'+name+'.sql', "w")
+
+            schema_ = "INSERT INTO {} (data, hora, valor) VALUES (?,?,?)".format(tb_name)
+
+            table.write(schema_)
+
+        def write_sql_search(tb_name):
+            table = open(os.path.join('sql', 'SEARCH_'+tb_name+'.sql'), "w")
+            schema_ = "SELECT cod, data, hora, valor FROM {} WHERE data=?".format(tb_name)
+            table.write(schema_)
+
+        def main(arg):
+            nome_csv = os.path.basename(arg)[:-4]
+            # Substitui espaços por _ para instanciar dentro do sqlite3
+            name = nome_csv.replace(" ", "_")
+            # Invoca as funções write
+            write_sql_table(name)
+            write_sql_insert(name, nome_csv)
+            write_sql_search(name)
+
+        self.read_directory(main, 'data_csv')
+
+    def sql_insert(self):
+
+        # Cria as tabelas coms os scripts .sql
+        def create_tables():
+            schemas = open(os.path.join('sql', 'schema_table.sql')).read()
+            self.db.cursor.executescript(schemas)
+
+        # Incere os dados do csv na respectiva tabela
+        def csv_inject(file):
+
+            # Abrir script Sqlite3
+            sqlite_script = open(
+                os.path.join('sql', file[:-4]+'.sql'), 'r').read()
+
+            # Abrir arquivo csv
+            reader = csv.reader(open(
+                os.path.join('data_csv', file), 'rt'), delimiter=',')
+
+            # Executa os camandos sql instanciando os dados do csv.
+            [self.db.cursor.execute(sqlite_script, info) for info in reader]
+            self.db.commit_db()
+
+        self.db = Sqlite_3()
+
+        create_tables()
+
+        #Looping que chama as funções
+        self.read_directory(csv_inject, 'data_csv')
+
+        self.db.close_db()
