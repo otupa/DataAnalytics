@@ -1,3 +1,6 @@
+
+from SoftScript import *
+
 def iniciar():
 
     print()
@@ -13,3 +16,4 @@ def iniciar():
 
 if __name__ == '__main__':
     iniciar()
+    a = SoftScript()
