@@ -378,7 +378,7 @@ class Application(Connections):
 
         #self.bt_export_pdf.place(relx=0.05, rely=0.725, relwidth=0.19, relheight=0.15)
 
-        self.bt_exportar_todos.place(relx=0.26, rely=0.725, relwidth=0.19, relheight=0.15)
+        self.bt_exportar_todos.place(relx=0.05, rely=0.725, relwidth=0.4, relheight=0.15)
 
 
     def Labels(self):

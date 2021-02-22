@@ -16,7 +16,7 @@ executables = [Executable("main.py", base=base, icon="icon.ico")]
 packages = ["tkinter", "tkcalendar", "pandas", "sqlite3"]
 
 # Arquivos nescessarios
-files = ['SoftScrip.py', 'GUI.py']
+files = ['SoftScript.py', 'GUI.py']
 
 # Opções do cx_Freeze
 options = {
