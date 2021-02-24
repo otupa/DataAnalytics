@@ -38,7 +38,7 @@ class Connections:
 
                 nome = file[:-4].replace(" ", "_")
 
-                paterns = "{}".format(nome), str(self.data_1), str(self.data_2), " "
+                paterns = "{}".format(file), str(self.data_1), str(self.data_2), " "
 
                 [self.select_tb(nome, date) for date in dates]
 
@@ -46,7 +46,7 @@ class Connections:
 
                 result.insert(0, paterns)
 
-                result.insert(1, ("Valor","N viajens","total","Porcentagem"))
+                result.insert(1, ("Valor","viajens","total","Porcentagem"))
 
                 local = os.path.join(destiny, nome+'.csv')
 
@@ -201,9 +201,9 @@ class Connections:
                 # Esquema que será exibido no Treview do tkinter 
                 schema = [
                     valor,                                  # valor
-                    "x "+str(amount_runs)+"  =",     # quantidade de vianjens
+                    str(amount_runs),                      # quantidade de vianjens
                     "R$"+str(mult_total)+",00",             # valor total das viajens
-                    "R$"+str(porcenting)                   # porcentagem da empresa
+                    "R$"+"{:,.2f}".format(porcenting).replace('.',',')   # porcentagem da empresa
                     ]
 
                 master_list.append(schema)
@@ -231,9 +231,9 @@ class Connections:
                 # Esquema que será exibido no Treview do tkinter 
                 schema = [
                     valor,                                  # valor
-                    "x "+str(amount_runs)+"  =",            # quantidade de vianjens
+                    str(amount_runs),                      # quantidade de vianjens
                     "R$"+str(mult_total)+",00",             # valor total das viajens
-                    "R$"+str(porcent_desc)              # porcentagem da empresa
+                    "R$"+str(porcent_desc).replace('.',',') # porcentagem da empresa
                     ]
 
                 master_list.append(schema)
@@ -245,10 +245,10 @@ class Connections:
 
             # Insere na lista principal o esquema com:
             master_list.append([
-                "Total:",                                       #
-                "x "+str(sum(total_runs)),                   # total de viajens
-                "R$"+str(sum_total_runs)+",00",             # total faturada pelo motorista
-                "R$"+str(round(sum(moto_porcent), 2))                            # total da porcentagem da empresa
+                "Total:",                                       
+                str(sum(total_runs)),                   # total de viajens
+                "R$"+str(sum_total_runs)+",00",              # total faturada pelo motorista
+                "R$"+str(round(sum(moto_porcent), 2)).replace('.',',') # total da porcentagem da empresa
                 ])
 
         def main():
