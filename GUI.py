@@ -24,6 +24,7 @@ class Connections:
 
         self.Menu_moto()
 
+
     def search_all(self):
 
         self.data_1 = self.calendar_one.get()
@@ -31,34 +32,32 @@ class Connections:
 
         dates = self.backend.date_generator(self.data_1, self.data_2)
 
-        destiny = filedialog.askdirectory()
+        pdf_destiny = filedialog.askdirectory()
 
-        try:
-            for file in os.listdir('data_csv'):
+        for file in os.listdir('data_csv'):
 
-                nome = file[:-4].replace(" ", "_")
+            nome = file[:-4].replace(" ", "_")
 
-                paterns = "{}".format(file), str(self.data_1), str(self.data_2), " "
+            paterns = "{}".format(file[:-4]), " ", str(self.data_1), str(self.data_2)
 
-                [self.select_tb(nome, date) for date in dates]
+            [self.select_tb(nome, date) for date in dates]
 
-                result = self.calculate_runs(self.calc_)
+            result = self.calculate_runs(self.calc_)
 
-                result.insert(0, paterns)
+            result.insert(0, paterns)
 
-                result.insert(1, ("Valor","viajens","total","Porcentagem"))
+            result.insert(1, ("valor","viajens","total","porcentagem"))
 
-                local = os.path.join(destiny, nome+'.csv')
+            local = os.path.join('result', nome+'.csv')
 
-                [pd.DataFrame(result).to_csv(local, header=False, encoding='utf-8', index=False)]
+            [pd.DataFrame(result).to_csv(local, header=False, encoding='utf-8', index=False)]
 
-                self.calc_.clear()
+            self.calc_.clear()
 
-            self.Result_db_serch.delete(*self.Result_db_serch.get_children())
-            self.Resultado.delete(*self.Resultado.get_children())
+        self.Result_db_serch.delete(*self.Result_db_serch.get_children())
+        self.Resultado.delete(*self.Resultado.get_children())
 
-        except Exception as error:
-            print("error: ", error)
+        self.generator.main(pdf_destiny)
 
 
     def search(self):
@@ -231,9 +230,9 @@ class Connections:
                 # Esquema que será exibido no Treview do tkinter 
                 schema = [
                     valor,                                  # valor
-                    str(amount_runs),                      # quantidade de vianjens
+                    str(amount_runs),                       # quantidade de vianjens
                     "R$"+str(mult_total)+",00",             # valor total das viajens
-                    "R$"+str(porcent_desc).replace('.',',') # porcentagem da empresa
+                    "R$"+"{:,.2f}".format(porcent_desc).replace('.',',') # porcentagem da empresa
                     ]
 
                 master_list.append(schema)
@@ -246,9 +245,9 @@ class Connections:
             # Insere na lista principal o esquema com:
             master_list.append([
                 "Total:",                                       
-                str(sum(total_runs)),                   # total de viajens
+                str(sum(total_runs)),                        # total de viajens
                 "R$"+str(sum_total_runs)+",00",              # total faturada pelo motorista
-                "R$"+str(round(sum(moto_porcent), 2)).replace('.',',') # total da porcentagem da empresa
+                "R$"+"{:,.2f}".format(round(sum(moto_porcent), 2)).replace('.',',')
                 ])
 
         def main():
@@ -269,6 +268,7 @@ class Application(Connections):
 
         self.backend = SoftScript()
         self.database = Sqlite_3()
+        self.generator = Pdf_generator()
 
         self.backend.delete_files()
         self.backend.create_dirs()
@@ -371,12 +371,12 @@ class Application(Connections):
         self.bt_export_pdf = Button(self.frame_1, text="EXPORTAR PDF", bd=2, 
             bg='#364094', fg='white', font=('verdana', 8, 'bold'), command=None)
 
-        self.bt_exportar_todos = Button(self.frame_1, text="EXPORTAR TUDO", bd=2, 
+        self.bt_exportar_todos = Button(self.frame_1, text="EXPORTAR CSV", bd=2, 
             bg='#D92A2A', fg='white', font=('verdana', 8, 'bold'), command=self.search_all)
 
         self.bt_pesquisar.place(relx=0.05, rely=0.5, relwidth=0.4, relheight=0.2)
 
-        #self.bt_export_pdf.place(relx=0.05, rely=0.725, relwidth=0.19, relheight=0.15)
+        self.bt_export_pdf.place(relx=0.05, rely=0.725, relwidth=0.19, relheight=0.15)
 
         self.bt_exportar_todos.place(relx=0.05, rely=0.725, relwidth=0.4, relheight=0.15)
 
