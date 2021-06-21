@@ -16,7 +16,11 @@ executables = [Executable("main.py", base=base, icon="icon.ico")]
 packages = ["tkinter", "tkcalendar", "pandas", "sqlite3"]
 
 # Arquivos nescessarios
+<<<<<<< HEAD
 files = ['SoftBackend.py', 'GUI.py']
+=======
+files = ['SoftScript.py', 'GUI.py']
+>>>>>>> flask
 
 # Opções do cx_Freeze
 options = {
