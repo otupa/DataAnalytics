@@ -10,6 +10,8 @@ def create_dirs():
         #os.makedirs("")
     except: pass
 
-def rm_dirs():
-    shutil.rmtree("data_csv")
-    shutil.rmtree("sql")
+def remove_dirs():
+    try:
+        shutil.rmtree("data_csv")
+        shutil.rmtree("sql")
+    except: pass

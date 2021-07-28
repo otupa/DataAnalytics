@@ -1,16 +1,14 @@
-from connect_sql import Connect
+from scripts.connect_sql import Connect
 import csv
 import os
 
-def create_tables():
+def csv_inject():
     db = Connect()
+
     schemas = open(os.path.join('sql', 'schema_table.sql')).read()
     db.cursor.executescript(schemas)
     db.commit_db()
-    db.close_db()
 
-def csv_inject():
-    db = Connect()
     for file in os.listdir('data_csv'):
 
         sql_archive = open(
