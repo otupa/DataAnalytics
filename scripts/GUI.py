@@ -47,27 +47,7 @@ class Funcoes():
         origem = filedialog.askdirectory()
         self.inicializar(origem)
         self.menu_moto()
-
-    def create_dirs(self):
-        os.mkdir('data_csv')
-        os.mkdir('sql') 
-
-    def delete_files(self):
-        try:
-            shutil.rmtree('data_csv', ignore_errors=False, onerror=None)
-        except Exception:
-            pass
-            
-        try:
-            shutil.rmtree('sql', ignore_errors=False, onerror=None)
-        except Exception:
-            pass
-
-        try:
-            os.remove('BaseG4.db')
-        except Exception:
-            pass
-
+        
 class Application(Funcoes):
 
     def __init__(self):

@@ -1,3 +1,4 @@
+import datetime
 import pandas
 import re
 import os
@@ -23,37 +24,42 @@ def save_csv(data_list, archive_name):
         header=False, encoding='utf-8', index=False)
 
 def filter(argument):
-    date = re.findall(r"\d+/\d+/\d+", argument)
-    hour = re.findall(r"\d+\:\d+", argument)
-    valor = re.findall(r"\d+\s+reais", argument)
-
-    format_line = [date, hour, valor]
-    if not format_line[0]:
-        format_line[0] = dataframe_list[-1][0]
     try:
-        for i, j in enumerate(format_line):
-            format_line[i] = j[0].replace(',','[').replace('!',']').replace('.','')
-    except Exception as error: 
-        print("Erro no filtro", error)
+        date = re.findall(r"\d+/\d+/\d+", argument)
+        date = datetime.datetime.strptime(date[0], "%d/%m/%Y").strftime("%Y-%m-%d")
+        if not date:
+            date = '0000-00-00'
+        hour = re.findall(r"\d+\:\d+", argument)
+        hour = hour[0]+':00'
+        date_time = "{} {}".format(date, hour)
+
+        valor = re.findall(r"\d+\s+reais", argument)
+        valor = valor[0][:-6]
+        if 'desconto no boleto' in argument:
+            operation = '-'
+        else:
+            operation = '+'
+        valor = "{}".format(operation)+valor
+
+        format_line = [date_time, valor]
+        dataframe_list.append(format_line)
+    except Exception as error:
+        print(error, argument)
         return True
-
-    if 'desconto no boleto' in argument:
-        format_line[2] = "-R$"+format_line[2][:-6]+",00"
-    else:
-        format_line[2] = "R$"+format_line[2][:-6]+",00"
-
-    dataframe_list.append(format_line)
     
 def extract(directory, arg_one, arg_two):
     for archive in os.listdir(directory):
         try:
-            dataframe_list = []
+            dataframe_list.clear()
             _open = open_archive(directory, archive)
             talk, name = _open
+            # print(talk)
+            print(name)
             fill_line = line_piker(talk, arg_one)
             filled_line = line_piker(fill_line, arg_two)
             for line in filled_line:
                 filter(line)
+            # print(dataframe_list)
             save_csv(dataframe_list, name)
         except Exception as error:
-            print("erro ao Extrair", error)
+            print("erro ao Extrair", error,dataframe_list[-1] )
