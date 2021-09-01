@@ -3,7 +3,6 @@
 import mariadb
 import sys
 
-# Connect to MariaDB Platform
 class Connect():
     def __init__(self):
         try:
@@ -26,3 +25,32 @@ class Connect():
 
     def close_db(self): 
         self.conn.close()
+    
+def show_tables():
+    connect = Connect()
+    connect.cursor.execute(
+        "select table_name \
+        FROM information_schema.tables \
+        WHERE table_schema = 'database_g4';")
+    list_ = [tables[0] for tables in connect.cursor.fetchall()]
+    connect.close_db()
+    return list_
+
+def search_runs(table_name, initial_date, final_date):
+    connect = Connect()
+    connect.cursor.execute(
+        "SELECT DATE_FORMAT(date_time, '%d/%m/%Y %H:%i'), valor \
+        FROM database_g4.{} \
+        WHERE date_time \
+        BETWEEN '{}' AND '{}';".format(table_name, initial_date, final_date))
+    list_ = [[tables[0], tables[1]] for tables in connect.cursor.fetchall()]
+    connect.close_db()
+    return list_
+    
+
+
+
+
+    
+
+    
