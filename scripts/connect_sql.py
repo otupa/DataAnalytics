@@ -70,9 +70,9 @@ def search_runs(table_name, initial_date, final_date):
         FROM database_g4.{} \
         WHERE date_time \
         BETWEEN '{}' AND '{}';".format(table_name, initial_date, final_date))
-    list_ = [[tables[0], tables[1], tables[2]] for tables in connect.cursor.fetchall()]
+    list_ = [[tables[0], tables[1], tables[2]] 
+        for tables in connect.cursor.fetchall()]
     connect.close_db()
-    print(list_)
     return list_
     
 
