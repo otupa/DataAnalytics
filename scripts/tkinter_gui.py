@@ -1,9 +1,8 @@
 import os
 
 # Scripts
-from scripts.insert_sql import csv_inject
 from scripts.extract_csv import extract
-from scripts.connect_sql import show_tables, search_runs
+from scripts.connect_sql import show_tables, search_runs, insert_data, create_sql_table
 from scripts.date_genarator import date_generator
 
 # Tkinter
@@ -14,14 +13,20 @@ from tkcalendar import Calendar, DateEntry
 from datetime import datetime
 
 
+
 class Funcoes():
+    def list_motorists(self):
+        motorists = show_tables()
+        if motorists == []:
+            motorists = ["not motorists"]
+        return motorists
     def clear_frames(self):
         self.treeview_data_list.delete(*self.treeview_data_list.get_children())
         self.Resultado.delete(*self.Resultado.get_children())
 
     def insert_treeviw(self, result_list):
         for data in result_list:
-            self.treeview_data_list.insert("", END, values=(data[0], data[1]))
+            self.treeview_data_list.insert("", END, values=(data[0], data[1], data[2]))
 
     def search_runs(self):
         self.clear_frames
@@ -37,7 +42,11 @@ class Funcoes():
     def importar(self):
         origem = filedialog.askdirectory()
         extract(origem, 'G4 MOBILE', 'reais')
+        create_sql_table()
+        insert_data()
+        self.list_motorists()
         self.menu_moto()
+
         
 class Application(Funcoes):
     def __init__(self):
@@ -53,11 +62,18 @@ class Application(Funcoes):
         self.treeview_one()
         self.treeview_data()
 
-
         window.mainloop()
 
     def tela(self):
         self.window.title("Soft G4")
+        self.window.configure(background='#1e3743')
+        self.window.geometry('800x700')
+        self.window.resizable(True, True)
+        self.window.maxsize(width=800, height=600)
+        self.window.minsize(width=500, height=400)
+
+    def window_task():
+        self.window.title("Window Task")
         self.window.configure(background='#1e3743')
         self.window.geometry('800x700')
         self.window.resizable(True, True)
@@ -101,7 +117,7 @@ class Application(Funcoes):
             relheight=0.46)
 
     def menu_moto(self):
-        self.options_menu_moto = show_tables()
+        self.options_menu_moto = self.list_motorists()
         self.drop_ = StringVar()
         self.drop_.set("MOTORISTA")
 
@@ -275,8 +291,8 @@ class Application(Funcoes):
 
         self.treeview_data_list = ttk.Treeview(
             self.frame_2, 
-            height=1, 
-            column=("coll1", "coll2"))
+            height=2, 
+            column=("coll1", "coll2", "coll3"))
 
         self.scroll_list = Scrollbar(
             self.frame_2, 
@@ -289,10 +305,12 @@ class Application(Funcoes):
         self.treeview_data_list.heading("#0", text="")
         self.treeview_data_list.heading("#1", text="date-time")
         self.treeview_data_list.heading("#2", text="valor")
+        self.treeview_data_list.heading("#3", text="type")
 
         self.treeview_data_list.column("#0", width=1)
         self.treeview_data_list.column("#1", width=45)
         self.treeview_data_list.column("#2", width=200)
+        self.treeview_data_list.column("#3", width=50)
 
 
         self.treeview_data_list.place(
@@ -307,8 +325,7 @@ class Application(Funcoes):
             relwidth=0.03, 
             relheight=0.85)
     
-    def window_task():
-        pass
+
          
 
 
