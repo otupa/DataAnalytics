@@ -18,6 +18,7 @@ def line_piker(archive_talk, argument):
     lines_piked = [linha for linha in archive_talk if argument in linha]
     return lines_piked
 
+
 def save_csv(data_list, archive_name):
     df_pd = pandas.DataFrame(data_list).to_csv(
         'data_csv/'+archive_name+'.csv', 
@@ -39,9 +40,8 @@ def filter(argument):
             operation = '-'
         else:
             operation = '+'
-        valor = "{}".format(operation)+valor
 
-        format_line = [date_time, valor]
+        format_line = [date_time, valor, operation]
         dataframe_list.append(format_line)
     except Exception as error:
         print(error, argument)
@@ -54,7 +54,7 @@ def extract(directory, arg_one, arg_two):
             _open = open_archive(directory, archive)
             talk, name = _open
             # print(talk)
-            print(name)
+            # print(name)
             fill_line = line_piker(talk, arg_one)
             filled_line = line_piker(fill_line, arg_two)
             for line in filled_line:

@@ -1,14 +1,16 @@
 import os
 
-def write_sql_table(arg):
+def create_sql_table(arg):
     table = open(os.path.join('sql', "schema_table.sql"), "a")
     schema_ = "CREATE TABLE IF NOT EXISTS {}(\
-date_time DATETIME, valor VARCHAR(11) NOT NULl);\n".format(arg)
+        date_time DATETIME, \
+        valor INTEGER(11) NOT NULl, \
+        operator VARCHAR(1));\n".format(arg)
     table.write(schema_)
 
 def write_sql_insert(tb_name, name):
     table = open('sql/insert/'+name+'.sql', "w")
-    schema_ = "INSERT IGNORE INTO {} (date_time, valor) \
+    schema_ = "INSERT IGNORE INTO {} (date_time, valor, operator) \
 VALUES ('{}','{}')".format(tb_name, {}, {})
     table.write(schema_)
 
