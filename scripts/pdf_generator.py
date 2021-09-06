@@ -1,79 +1,43 @@
-
-
-class Pdf_generator(SoftScript):
-
-    def main(self, arg):
-        for file in os.listdir('result'):
-            self.main_loop(file, arg)
+from fpdf import FPDF
+import os
     
-    def main_loop(self, arg, destiny):
-        archive = open(os.path.join('result', arg))
-        nome_csv = os.path.basename(arg)[:-4]
-        name = nome_csv.replace(" ", "_")
-        a = from_csv(archive)
-        header, data = self.get_data_from_prettytable(a)
+list_ = [[13, 57, 741, 111.0], [15, 23, 345, 52.0], [11, 175, 1925, 289.0], [25, 19, 475, 95.0], [22, 7, 154, 31.0], [34, 1, 34, 7.0], [50, 2, 100, 20.0], [35, 1, 35, 7.0], [40, 3, 120, 24.0], [60, 1, 60, 12.0], [11, 1, 11, -9.0], [44, 1, 44, 9.0], [12, 151, 1812, 272.0], [20, 1, 20, 3.0], [28, 2, 56, 11.0], [0, 445, 5932, 934.0]]
+def string_list(argument):
+    return [['R$'+str(int(valor))+',00' 
+                    for valor in item] 
+                    for item in argument]
 
-        self.export_to_pdf(header, data, name, destiny)
+def export_to_pdf(name, date_one, date_two, argument, directory):
+    pdf = FPDF()                                # New  pdf object
+    pdf.set_font("Arial", size=12)              # Font style
+    whitd = pdf.w - 2*pdf.l_margin              # Witdh of document
+    col_width = pdf.w / 4.5                     # Column width in table
+    row_height = pdf.font_size * 1.5            # Row height in table
+    spacing = 1.3                               # Space in each cell
 
-    def get_data_from_prettytable(self, data):
+    pdf.add_page()                              # add new page
 
-        def remove_space(liste):
+    pdf.cell(whitd, 0.0, 'Fatura Semanal - G4 Mobile', align='C')
+    pdf.ln(row_height*spacing)                  
 
-            list_without_space = []
-            for mot in liste:                                       # For each word in list
-                word_without_space = mot.replace(' ', '')           # word without space
-                list_without_space.append(word_without_space)       # list of word without space
-            return list_without_space
+    pdf.cell(col_width, row_height*spacing, '{}'.format(name), border=0)
+    pdf.cell(col_width, row_height*spacing, '', border=0)
+    pdf.cell(col_width, row_height*spacing, '{}'.format(date_one), border=0)
+    pdf.cell(col_width, row_height*spacing, '{}'.format(date_two), border=0)
+    pdf.ln(pdf.font_size)
 
-        # Get each row of the table
-        string_x = str(data).split('\n')                               # Get a list of row
-        header = string_x[1].split('|')[1: -1]                      # Columns names
-        rows = string_x[3:len(string_x) - 1]                        # List of rows
 
-        list_word_per_row = []
-        for row in rows:                                            # For each word in a row
-            row_resize = row.split('|')[1:-1]                       # Remove first and last arguments
-            list_word_per_row.append(remove_space(row_resize))      # Remove spaces
-
-        return header, list_word_per_row
-    
-
-    def export_to_pdf(self, header, data, name, destiny):
-
-        pdf = FPDF()                                # New  pdf object
-
-        pdf.set_font("Arial", size=12)              # Font style
-        epw = pdf.w - 2*pdf.l_margin                # Witdh of document
-        col_width = pdf.w / 4.5                     # Column width in table
-        row_height = pdf.font_size * 1.5            # Row height in table
-        spacing = 1.3                               # Space in each cell
-
-        pdf.add_page()                              # add new page
-
-        pdf.cell(epw, 0.0, 'FATURA SEMANAL', align='C') 
-        pdf.ln(row_height*spacing)                  
-
+    for i in string_list(argument):
+        for item in i:
+            pdf.cell(col_width, row_height*spacing, '{}'.format(item), border=0)
+        pdf.ln(pdf.font_size)
+                       
         
-        for item in header:                        
-            pdf.cell(col_width, row_height*spacing, 
-                    txt=item, border=0)
-        pdf.ln(row_height*spacing)           
 
-        final = data.pop(-1)
+    pdf.ln(row_height*spacing)           
 
-        for row in data:                           
-            for item in row:                       
-                pdf.cell(col_width, row_height*spacing, 
-                        txt=item, border=1)
+    pdf.output(os.path.join(directory,'{}.pdf'.format(name)))
+        
+    pdf.close()                                 
 
-                
-            pdf.ln(row_height*spacing)       
-        pdf.ln(row_height*spacing)              
-
-        for i in final:
-            pdf.cell(col_width, row_height*spacing,
-                        txt=i, border=1)
-
-        pdf.output(os.path.join(destiny,'{}.pdf'.format(name)))
-         
-        pdf.close()                                 
+export_to_pdf('motorista', '446546', '456465', list_, "C:/Users/tupa/Workspace/SoftG4")

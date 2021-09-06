@@ -38,20 +38,33 @@ class Funcoes():
             "", END, values=(data[0], data[1], data[2], data[3]))
                                             for data in argument]
 
-    def search_runs(self):
-        self.clear_frames()
+    def name(self):
+        return self.drop_.get()
 
-        motorist_name = self.drop_.get()
+    def date_one(self):
+        return date_generator(self.calendar_1.get())
 
-        data_1 = date_generator(self.calendar_1.get())
-        data_2 = date_generator(self.calendar_2.get())
+    def date_two(self):
+        return date_generator(self.calendar_2.get())
 
-        porcents_ = (0.10, -0.90, 0.15, -0.85, 0.20, -0.80)
-        result = search_runs(motorist_name, data_1, data_2)
-        result_calc = calculation(result, porcents_)
+    def search_sql(self):
+        return search_runs(self.name(), self.date_one(), self.date_two())
+
+    def porcents(self):
+        return (0.10, -0.90, 0.15, -0.85, 0.20, -0.80)
+
+    def calculation_(self):
+        return calculation(self.search_sql(), self.porcents())
+
+    def search_(self):
+        self.clear_frames()       
+        print(self.calculation_()) 
+        self.insert_treeview_one(self.calculation_())
+        self.insert_treeviw_data(self.search_sql())
+
+    def search_all():
+        pass
         
-        self.insert_treeview_one(result_calc)
-        self.insert_treeviw_data(result)
 
     def importar(self):
         origem = filedialog.askdirectory()
@@ -192,7 +205,7 @@ class Application(Funcoes):
             bg='#364094', 
             fg='white', 
             font=('verdana', 10, 'bold'), 
-            command=self.search_runs)
+            command=self.search_)
 
         self.bt_export_pdf = Button(
             self.frame_1, 
