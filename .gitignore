@@ -59,3 +59,14 @@ scripts/__pycache__/extract_csv.cpython-39.pyc
 scripts/__pycache__/filter_talk.cpython-39.pyc
 scripts/__pycache__/insert_sqlite.cpython-39.pyc
 scripts/__pycache__/write_sql.cpython-39.pyc
+scripts/pdf_generator.py
+scripts/__pycache__/calculating.cpython-39.pyc
+scripts/__pycache__/date_genarator.cpython-39.pyc
+scripts/__pycache__/insert_sql.cpython-39.pyc
+scripts/__pycache__/tkinter_gui.cpython-39.pyc
+scripts/tests/calc runs.py
+scripts/tests/extract_test.py
+scripts/tests/sql_test.py
+.vscode/launch.json
+__pycache__/GUI.cpython-39.pyc
+__pycache__/SoftBackend.cpython-39.pyc
