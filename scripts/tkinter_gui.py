@@ -1,6 +1,7 @@
 import os
 
 # Scripts
+from scripts.calculating import calculation
 from scripts.extract_csv import extract
 from scripts.connect_sql import show_tables, search_runs, insert_data, create_sql_table
 from scripts.date_genarator import date_generator
@@ -20,24 +21,37 @@ class Funcoes():
         if motorists == []:
             motorists = ["not motorists"]
         return motorists
-    def clear_frames(self):
-        self.treeview_data_list.delete(*self.treeview_data_list.get_children())
-        self.Resultado.delete(*self.Resultado.get_children())
 
-    def insert_treeviw(self, result_list):
-        for data in result_list:
-            self.treeview_data_list.insert("", END, values=(data[0], data[1], data[2]))
+    def clear_frames(self):
+        self.treeview_data_list.delete(
+            *self.treeview_data_list.get_children())
+        self.treeview_one.delete(
+            *self.treeview_one.get_children())
+
+    def insert_treeviw_data(self, result_list):
+        [self.treeview_data_list.insert(
+            "", END, values=(data[0], data[1], data[2]))
+                                for data in result_list]
+    
+    def insert_treeview_one(self, argument):
+        [self.treeview_one.insert(
+            "", END, values=(data[0], data[1], data[2], data[3]))
+                                            for data in argument]
 
     def search_runs(self):
-        self.clear_frames
+        self.clear_frames()
+
         motorist_name = self.drop_.get()
 
         data_1 = date_generator(self.calendar_1.get())
         data_2 = date_generator(self.calendar_2.get())
-        
+
+        porcents_ = (0.10, -0.90, 0.15, -0.85, 0.20, -0.80)
         result = search_runs(motorist_name, data_1, data_2)
+        result_calc = calculation(result, porcents_)
         
-        self.insert_treeviw(result)
+        self.insert_treeview_one(result_calc)
+        self.insert_treeviw_data(result)
 
     def importar(self):
         origem = filedialog.askdirectory()
@@ -256,26 +270,26 @@ class Application(Funcoes):
             rely = 0.27)
 
     def treeview_one(self):
-        self.Resultado = ttk.Treeview(self.frame_1, height=3, 
+        self.treeview_one = ttk.Treeview(self.frame_1, height=3, 
             column=("coll1", "coll2", "coll3", "coll4"))
 
         self.scroll_list = Scrollbar(self.frame_1, orient='vertical', 
-            command=self.Resultado.yview)
-        self.Resultado.configure(yscrollcommand=self.scroll_list.set)
+            command=self.treeview_one.yview)
+        self.treeview_one.configure(yscrollcommand=self.scroll_list.set)
 
-        self.Resultado.heading("#0", text="")
-        self.Resultado.heading("#1", text="Valores")
-        self.Resultado.heading("#2", text="N° de viajens")
-        self.Resultado.heading("#3", text="Total")
-        self.Resultado.heading("#4", text="Porcentagens")
+        self.treeview_one.heading("#0", text="")
+        self.treeview_one.heading("#1", text="Valores")
+        self.treeview_one.heading("#2", text="N° de viajens")
+        self.treeview_one.heading("#3", text="Total")
+        self.treeview_one.heading("#4", text="Porcentagens")
 
-        self.Resultado.column("#0", width=0)
-        self.Resultado.column("#1", width=50)
-        self.Resultado.column("#2", width=50)
-        self.Resultado.column("#3", width=75)
-        self.Resultado.column("#4", width=75)
+        self.treeview_one.column("#0", width=0)
+        self.treeview_one.column("#1", width=50)
+        self.treeview_one.column("#2", width=50)
+        self.treeview_one.column("#3", width=75)
+        self.treeview_one.column("#4", width=75)
         
-        self.Resultado.place(
+        self.treeview_one.place(
             relx=0.50, 
             rely=0.1, 
             relwidth=0.435, 
