@@ -4,7 +4,7 @@
 
 ### Descrição:
 
-Software de contabilidade desenvolvido para a empresas de mobilidade que operam utilizando o whatsapp.
+Software de contabilidade desenvolvido para empresas de mobilidade que operam utilizando o aplicativo Whatsapp.
 
 A aplicação pode receber arquivos .txt de conversas de Whatsapp, extrai-las, analiza-las e inserir as informações um uma base de dados MariaDB.
 A partir da interface grafica o usuario pode selecionar os arquivos que serão analizados e realizar pesquisas, e exportar relatórios em um intervalo de datas.
