@@ -1,6 +1,6 @@
 #  Whatsapp - DataAnalytcs
 
-![tkinter](https://img.shields.io/badge/tkinter-V3.9-green) ![tkcalendar](https://img.shields.io/badge/tkcalendar-V1.6.1-green) ![sqlite3](https://img.shields.io/badge/sqlite3-V2.6-green) ![pandas](https://img.shields.io/badge/pandas-V1.2.2-green) ![cx_freeze](https://img.shields.io/badge/cx_freeze-V6.5.3-green)
+![tkinter](https://img.shields.io/badge/tkinter-V3.9-green) ![tkcalendar](https://img.shields.io/badge/tkcalendar-V1.6.1-green) ![mariadb](https://img.shields.io/badge/sqlite3-V2.6-green) ![pandas](https://img.shields.io/badge/pandas-V1.2.2-green) ![cx_freeze](https://img.shields.io/badge/cx_freeze-V6.5.3-green)
 
 ### Descrição:
 
