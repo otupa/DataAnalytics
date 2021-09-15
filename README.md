@@ -4,10 +4,10 @@
 
 ### Descrição:
 
-Software de contabilidade desenvolvido para a empresa G4 Mobile (http://g4mobile.com.br)
+Software de contabilidade desenvolvido para a empresas de mobilidade que operam utilizando o whatsapp.
 
-A aplicação pode receber arquivos .txt de conversas de Whatsapp, extrai-las, analiza-las e inserir as informações um uma base de dados Sqlite3.
-A partir da interface grafica o usuario pode selecionar os arquivos que serão analizados e realizar pesquisas, podendo escolher uma tabela e um intervalo entre duas datas.
+A aplicação pode receber arquivos .txt de conversas de Whatsapp, extrai-las, analiza-las e inserir as informações um uma base de dados MariaDB.
+A partir da interface grafica o usuario pode selecionar os arquivos que serão analizados e realizar pesquisas, e exportar relatórios em um intervalo de datas.
 
 
 
