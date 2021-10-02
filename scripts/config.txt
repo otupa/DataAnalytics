@@ -1,0 +1,13 @@
+{
+   "values": {
+      "common": {
+         "normal": {},
+         "desc": {}
+      },
+      "special": {
+         "normal": {},
+         "desc": {}
+      }
+   },
+   "records": {}
+}

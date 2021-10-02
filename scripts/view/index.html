@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Fatura Semanal - G4 Mobile</title>  <!-- Font Awesome -->
+  <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"> -->
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <!-- Material Design Bootstrap -->
+  <link rel="stylesheet" href="css/mdb.min.css">
+  <style>
+      .ul-ho ul li {
+        display: inline-block;
+        padding-right: 50px;
+        font: 18px Arial;
+        font-weight: bold;
+      }
+  </style>
+</head>
+<body class="fixed-sn white-skin">
+
+  <main>
+    <div class="container-fluid">
+      <h4 class="my-4 dark-grey-text font-weight-bold" align="center">Fatura Semanal - G4 Mobile</h4>
+      <!-- Section: Head options -->
+      <section>
+        <div class="card">
+          <div class="card-body">
+            <div class="ul-ho" align="center">
+            <ul>
+                <li>{{ name }}</li>
+                <li>{{ date }}</li>
+                <li>{{ date_ }}</li>
+            </ul>
+            </div> 
+            <!-- Table -->
+            <table class="table">
+              <!-- Table head -->
+              <thead class="blue-grey lighten-4 table-striped">
+                <tr>
+                  <th>Valores</th>
+                  <th>Quantidade de Viajens</th>
+                  <th>Faturamento do Motorista</th>
+                  <th>Porcentagem a Pagar</th>
+                </tr>
+              </thead>
+              <!-- Table head -->
+              <!-- Table body -->
+              <tbody>
+                {% for item in argument %}
+                  <tr>
+                  {% for valor in item %}
+                    <td>{{ valor }}</td>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+        <div class="container-fluid">
+          <h5></h5>
+          <!-- Section: Head options -->
+          <section>
+            <div class="card">
+              <div class="card-body">
+                <!-- Table -->
+                <table class="table">
+                  <!-- Table head -->
+                  <thead class="blue-grey lighten-4 table-striped">
+                    <tr>
+                      <th>Total de Viajens</th>
+                      <th>Faturamento</th>
+                      <th>Porcentagem a Pagar</th>
+                    </tr>
+                  </thead>
+                  <!-- Table head -->
+                  <!-- Table body -->
+                  <tbody>
+                    <tr>
+                      {% for item in total %}
+                        <td>{{ item }}</td>
+                      {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+    </main>
+</html>

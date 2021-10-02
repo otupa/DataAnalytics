@@ -15,9 +15,7 @@ def open_archive(directory, archive):
         print("Erro ao abrir arquivos", error)
 
 def line_piker(archive_talk, argument):
-    lines_piked = [linha for linha in archive_talk if argument in linha]
-    return lines_piked
-
+    return [linha for linha in archive_talk if argument in linha]
 
 def save_csv(data_list, archive_name):
     df_pd = pandas.DataFrame(data_list).to_csv(

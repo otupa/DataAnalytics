@@ -2,7 +2,13 @@ from typing import Counter
 
 
 def counter_runs(argument):
-    # valor, quant, sum, operation
+    """[summary]
+    Args:
+        argument ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """    
     dict_ = Counter([(item[1], item[2]) for item in argument])
     return [[item[0], dict_[item], item[0] * dict_[item], item[1]] for item in dict_]
 
@@ -35,10 +41,10 @@ def calc_porcent(argument, porcents):
     return [[item for item in porcent(item, porcents)] 
                     for item in counter_runs(argument)]
                            
-def calculation(argument, porcents):
+def calculate(argument, porcents):
     list_ = calc_porcent(argument, porcents)
     runs_ = round(sum([item[1] for item in list_]), 0)
     porcent_ = round(sum([item[2] for item in list_]), 0)
     faturation_ = round(sum([item[3] for item in list_]), 0)
-    list_.append(['', runs_, porcent_, faturation_])
+    list_.append([runs_, porcent_, faturation_])
     return list_

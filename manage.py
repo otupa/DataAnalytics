@@ -1,7 +1,8 @@
+
 from scripts.dir_manager import create_dirs, remove_dirs
 from scripts.write_sql import write
 from scripts.tkinter_gui import Application
-# directory_talks = input()
+# directory_talks = input()ö
 
 if __name__ == '__main__':
     remove_dirs()
@@ -9,4 +10,3 @@ if __name__ == '__main__':
     Application()
     write()
     remove_dirs()
-

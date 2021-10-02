@@ -1,7 +1,6 @@
 from fpdf import FPDF
 import os
-    
-list_ = [[13, 57, 741, 111.0], [15, 23, 345, 52.0], [11, 175, 1925, 289.0], [25, 19, 475, 95.0], [22, 7, 154, 31.0], [34, 1, 34, 7.0], [50, 2, 100, 20.0], [35, 1, 35, 7.0], [40, 3, 120, 24.0], [60, 1, 60, 12.0], [11, 1, 11, -9.0], [44, 1, 44, 9.0], [12, 151, 1812, 272.0], [20, 1, 20, 3.0], [28, 2, 56, 11.0], [0, 445, 5932, 934.0]]
+
 def string_list(argument):
     return [['R$'+str(int(valor))+',00' 
                     for valor in item] 
@@ -20,16 +19,15 @@ def export_to_pdf(name, date_one, date_two, argument, directory):
     pdf.cell(whitd, 0.0, 'Fatura Semanal - G4 Mobile', align='C')
     pdf.ln(row_height*spacing)                  
 
-    pdf.cell(col_width, row_height*spacing, '{}'.format(name), border=0)
+    pdf.cell(col_width, row_height*spacing, '{}'.format(name), border=1)
     pdf.cell(col_width, row_height*spacing, '', border=0)
     pdf.cell(col_width, row_height*spacing, '{}'.format(date_one), border=0)
     pdf.cell(col_width, row_height*spacing, '{}'.format(date_two), border=0)
     pdf.ln(pdf.font_size)
 
-
     for i in string_list(argument):
         for item in i:
-            pdf.cell(col_width, row_height*spacing, '{}'.format(item), border=0)
+            pdf.cell(col_width, row_height*spacing, '{}'.format(item), border=1)
         pdf.ln(pdf.font_size)
                        
         
@@ -41,3 +39,37 @@ def export_to_pdf(name, date_one, date_two, argument, directory):
     pdf.close()                                 
 
 export_to_pdf('motorista', '446546', '456465', list_, "C:/Users/tupa/Workspace/SoftG4")
+
+from datetime import date
+from os import name
+from jinja2 import Template, Environment, FileSystemLoader, BaseLoader
+from jinja2.nodes import With
+from os.path import join
+# from weasyprint import HTML, CSS
+import locale
+
+locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')  
+path = 'C:/Users/tupa/Workspace/SoftG4/scripts/view/'
+
+def piker(argument):
+    return [[
+        locale.currency(item[0]),
+        item[1],
+        locale.currency(item[2]),
+        locale.currency(item[3])] for item in argument]
+
+def piker_total(item):
+    return [item[0], locale.currency(item[1]), locale.currency(item[2])]
+    
+def render_html(argument, name, date_one, date_two):
+    archive = open(join(path, 'index.html'))
+    template_ = Template(archive.read())
+    total_ = piker_total(argument.pop(-1))
+    runs_ = piker(argument)
+    return template_.render(name=name, date=date_one, date_=date_two, argument=runs_, total=total_)
+
+def save_pdf(argument, date_one, date_two, directory):
+#     html = render_html(argument, name, date_one, date_two)
+#     HTML(string=html, stylesheets=[CSS('./view/css/bootstrap.css'), CSS('/view/css/mdb.css')])
+    pass
+
